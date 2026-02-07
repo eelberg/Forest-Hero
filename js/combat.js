@@ -79,10 +79,10 @@ export function fight(energySpent, enemyStrength) {
  */
 export function flee() {
     return rollProbability([
-        { chance: 0.40, result: FLEE_RESULT.ESCAPE },
+        { chance: 0.45, result: FLEE_RESULT.ESCAPE },
         { chance: 0.30, result: FLEE_RESULT.CAUGHT },
         { chance: 0.20, result: FLEE_RESULT.FORCED_FIGHT },
-        { chance: 0.10, result: FLEE_RESULT.KILLED },
+        { chance: 0.05, result: FLEE_RESULT.KILLED },
     ]);
 }
 
