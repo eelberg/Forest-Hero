@@ -61,12 +61,38 @@ body {
     border-radius: var(--radius);
     margin-bottom: 0.5rem;
     border: 1px solid var(--border-color);
+    position: relative;
 }
 
 .game-header h1 {
     font-size: 1.5rem;
     color: var(--accent-gold);
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.btn-help {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 2px solid var(--accent-gold);
+    color: var(--accent-gold);
+    font-size: 1.1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.btn-help:hover {
+    background: var(--accent-gold);
+    color: #1a1a2e;
 }
 
 /* --- Panels --- */
@@ -219,22 +245,22 @@ body {
     opacity: 0.85;
 }
 
-/* Bosque por nivel de riesgo (4 niveles) - Fondos sutiles, el ícono es la pista */
+/* Bosque por nivel de riesgo (4 niveles) - Verde claro → muy oscuro */
 .forest-open {
-    background: linear-gradient(135deg, #1b3d1b, #244a24) !important;
-    border-color: #2d5c2d !important;
+    background: linear-gradient(135deg, #4a7c3f, #5d9a4e) !important;
+    border-color: #6aaa5a !important;
 }
 .forest-plants {
-    background: linear-gradient(135deg, #183818, #214421) !important;
-    border-color: #2a542a !important;
+    background: linear-gradient(135deg, #2e6328, #3d7a34) !important;
+    border-color: #4a8a40 !important;
 }
 .forest-shrubs {
-    background: linear-gradient(135deg, #153315, #1e3e1e) !important;
-    border-color: #274c27 !important;
+    background: linear-gradient(135deg, #1a4a18, #265c22) !important;
+    border-color: #2f6a2a !important;
 }
 .forest-dense {
-    background: linear-gradient(135deg, #122e12, #1b381b) !important;
-    border-color: #244424 !important;
+    background: linear-gradient(135deg, #0d1f0c, #142e12) !important;
+    border-color: #1a3818 !important;
 }
 
 .unknown-cell {
@@ -685,6 +711,54 @@ body {
 
 .overlay-screen.visible {
     display: flex;
+}
+
+/* --- Pantalla de ayuda --- */
+.help-content {
+    max-width: 600px;
+    margin: auto 0;
+    animation: fadeIn 0.3s ease;
+    padding: 1.5rem;
+}
+
+.help-content h1 {
+    text-align: center;
+    color: var(--accent-gold);
+    margin-bottom: 1.2rem;
+    font-size: 1.6rem;
+}
+
+.help-section {
+    margin-bottom: 1.2rem;
+}
+
+.help-section h3 {
+    color: var(--accent-blue);
+    margin-bottom: 0.4rem;
+    font-size: 1.05rem;
+}
+
+.help-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.92rem;
+}
+
+.btn-close-help {
+    display: block;
+    margin: 1.5rem auto 0;
+    padding: 0.6rem 2rem;
+    background: var(--accent-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-close-help:hover {
+    background: #5a9fd4;
 }
 
 /* --- Pantalla de inicio --- */

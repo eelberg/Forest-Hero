@@ -52,7 +52,12 @@ export function initUI() {
         gameContainer: document.getElementById('game-container'),
         startScreen: document.getElementById('start-screen'),
         endScreen: document.getElementById('end-screen'),
+        helpScreen: document.getElementById('help-screen'),
+        btnHelp: document.getElementById('btn-help'),
     };
+
+    // Renderizar contenido de ayuda e inicializar botón
+    renderHelpScreen();
 }
 
 // ===========================
@@ -439,11 +444,15 @@ function renderFightInput(callbacks, isForced = false) {
     const state = getState();
     const enemy = state.encounter.enemy;
 
+    // Escala: 0 a min(3× fuerza enemigo, energía del jugador)
+    const maxSlider = Math.min(enemy.totalStrength * 3, state.player.energy);
+    const defaultValue = Math.min(enemy.totalStrength, maxSlider);
+
     let html = `<div class="action-group"><h4>⚔️ ¿Cuánta energía inviertes?</h4>`;
     html += `<p class="input-hint">Fuerza del enemigo: ${enemy.totalStrength} | Tu energía: ${state.player.energy}</p>`;
     html += `<div class="input-row">`;
-    html += `<input type="range" id="energy-slider" min="1" max="${state.player.energy}" value="${Math.min(enemy.totalStrength, state.player.energy)}" class="energy-slider">`;
-    html += `<span id="energy-display" class="energy-display">${Math.min(enemy.totalStrength, state.player.energy)}</span>`;
+    html += `<input type="range" id="energy-slider" min="1" max="${maxSlider}" value="${defaultValue}" class="energy-slider">`;
+    html += `<span id="energy-display" class="energy-display">${defaultValue}</span>`;
     html += `</div>`;
     html += `<div class="input-row">`;
     html += `<button class="btn-action btn-confirm" data-action="confirm-fight">⚔️ ¡A la batalla!</button>`;
@@ -457,11 +466,15 @@ function renderFightInput(callbacks, isForced = false) {
 function renderBribeInput(callbacks) {
     const state = getState();
 
+    // Escala: 0 a min(200, oro del jugador)
+    const maxGoldSlider = Math.min(200, state.player.gold);
+    const defaultGold = Math.min(50, maxGoldSlider);
+
     let html = `<div class="action-group"><h4>💰 ¿Cuántas monedas ofreces?</h4>`;
     html += `<p class="input-hint">Tu oro: ${state.player.gold} monedas</p>`;
     html += `<div class="input-row">`;
-    html += `<input type="range" id="gold-slider" min="1" max="${state.player.gold}" value="${Math.min(50, state.player.gold)}" class="gold-slider">`;
-    html += `<span id="gold-display" class="gold-display">${Math.min(50, state.player.gold)}</span>`;
+    html += `<input type="range" id="gold-slider" min="1" max="${maxGoldSlider}" value="${defaultGold}" class="gold-slider">`;
+    html += `<span id="gold-display" class="gold-display">${defaultGold}</span>`;
     html += `</div>`;
     html += `<div class="input-row">`;
     html += `<button class="btn-action btn-confirm" data-action="confirm-bribe">💰 Ofrecer</button>`;
@@ -741,6 +754,75 @@ export function renderStartScreen(onStart) {
     document.getElementById('btn-start').addEventListener('click', () => {
         elements.startScreen.classList.remove('visible');
         onStart();
+    });
+}
+
+// ===========================
+// PANTALLA DE AYUDA
+// ===========================
+
+/**
+ * Renderiza la pantalla de ayuda y conecta el botón.
+ */
+function renderHelpScreen() {
+    elements.helpScreen.innerHTML = `
+        <div class="help-content">
+            <h1>❓ Ayuda</h1>
+
+            <div class="help-section">
+                <h3>🎯 Objetivo</h3>
+                <p>Adéntrate en el bosque, encuentra al Hechicero que tiene cautiva a la Princesa,
+                derrótalo (a él y a su Dragón), y lleva a la Princesa a cualquier borde del mapa para escapar.</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🧭 Movimiento</h3>
+                <p>Usa los botones de dirección (Norte, Sur, Este, Oeste) para moverte por el bosque.
+                Los pantanos (🟢) bloquean el paso. Las casillas despejadas (✅) son seguras.
+                El color de fondo de las casillas indica el peligro: más oscuro = más peligroso.</p>
+            </div>
+
+            <div class="help-section">
+                <h3>⚔️ Combate</h3>
+                <p>Al encontrar una criatura puedes pelear invirtiendo parte de tu energía.
+                Cuanta más energía inviertas respecto a la fuerza del enemigo, mayor la probabilidad de ganar.
+                Si ganas, obtienes su tesoro. Si empatas, pierdes la energía pero puedes reintentarlo.
+                Si pierdes, mueres.</p>
+            </div>
+
+            <div class="help-section">
+                <h3>💰 Soborno</h3>
+                <p>Puedes ofrecer monedas de oro para que el enemigo te deje pasar.
+                Cuantas más monedas ofrezcas, más probable que acepte.
+                Si ofreces muy poco, puede sentirse insultado y obligarte a pelear.</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🏃 Huida</h3>
+                <p>Puedes intentar correr. Hay posibilidad de escapar a una casilla adyacente,
+                ser atrapado (eliges de nuevo), ser forzado a pelear, o incluso morir en el intento.</p>
+            </div>
+
+            <div class="help-section">
+                <h3>🎒 Inventario</h3>
+                <p>Al derrotar criaturas, hay una pequeña probabilidad de encontrar tesoros escondidos:
+                objetos especiales de un solo uso como anillos, espadas, alas mágicas, elixires y más.
+                Puedes usarlos durante un encuentro.</p>
+            </div>
+
+            <button class="btn-close-help" id="btn-close-help">Entendido</button>
+        </div>`;
+
+    // Abrir ayuda
+    elements.btnHelp.addEventListener('click', () => {
+        elements.helpScreen.classList.add('visible');
+    });
+
+    // Cerrar ayuda
+    elements.helpScreen.addEventListener('click', (e) => {
+        if (e.target === elements.helpScreen || e.target.id === 'btn-close-help') {
+            elements.helpScreen.classList.remove('visible');
+        }
     });
 }
 
