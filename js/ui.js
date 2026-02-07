@@ -6,7 +6,7 @@ import { getState, addLog, GameState } from './game.js';
 import { MAP_SIZE } from './map.js';
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, savePseudonym, getFullUserState } from './auth.js';
 import { suggestAvailablePseudonym, checkPseudonymAvailable } from './pseudonym.js';
-import { getTopScores, submitScore, checkIfTopScore } from './leaderboard.js';
+import { getTopScores, submitScore, checkIfTopScore, getUserBestScore } from './leaderboard.js';
 
 // --- Colores por tier de enemigo ---
 const TIER_COLORS = {
@@ -778,8 +778,9 @@ export async function renderWelcomeScreen(welcomeCallbacks) {
     const { user, profile, pseudonym } = await getFullUserState();
 
     if (user && profile) {
-        // Usuario autenticado con perfil completo
-        renderWelcomeLoggedIn(user, profile, welcomeCallbacks);
+        // Usuario autenticado con perfil completo: cargar record personal
+        const bestResult = await getUserBestScore(user.uid);
+        renderWelcomeLoggedIn(user, profile, bestResult, welcomeCallbacks);
     } else if (user && !profile) {
         // Usuario autenticado pero sin perfil → pedir seudónimo
         renderWelcomeNeedsProfile(user, welcomeCallbacks);
@@ -793,14 +794,20 @@ export async function renderWelcomeScreen(welcomeCallbacks) {
 
 /**
  * Vista de bienvenida para usuario autenticado.
+ * @param {object} bestResult - Resultado de getUserBestScore: { score, title }
  */
-function renderWelcomeLoggedIn(user, profile, welcomeCallbacks) {
+function renderWelcomeLoggedIn(user, profile, bestResult, welcomeCallbacks) {
+    const recordText = bestResult.score != null
+        ? `🏅 Récord: ${bestResult.score.toLocaleString('es-CL')} pts — ${bestResult.title}`
+        : '🏅 Aún sin récord — ¡juega tu primera partida!';
+
     elements.welcomeScreen.innerHTML = `
         <div class="welcome-content">
             <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
             <div class="welcome-user-info">
                 <p class="welcome-greeting">Bienvenido de vuelta,</p>
                 <p class="welcome-pseudonym">🛡️ ${profile.pseudonym}</p>
+                <p class="welcome-record">${recordText}</p>
             </div>
             <div class="start-image-container">
                 <img src="img/princess_captive.png" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
@@ -1352,7 +1359,7 @@ async function loadHonorScores(period) {
     const container = document.getElementById('honor-table-container');
     container.innerHTML = '<p class="honor-loading">Cargando...</p>';
 
-    const { scores, error } = await getTopScores(period, 20);
+    const { scores, error } = await getTopScores(period, 10);
 
     if (error) {
         container.innerHTML = '<p class="honor-empty">Error al cargar los puntajes. Intenta de nuevo.</p>';

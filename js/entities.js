@@ -66,7 +66,7 @@ export const HIDDEN_TREASURES = [
         id: 'pildora_explosiva',
         name: 'Píldora explosiva',
         emoji: '💊',
-        description: 'Si la usas... explotas y mueres.',
+        description: 'Una píldora de aspecto siniestro. ¿Qué pasará si la usas?',
         effect: 'self_destruct'
     },
     {

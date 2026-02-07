@@ -833,6 +833,12 @@ body {
     text-shadow: 0 0 8px rgba(255,215,0,0.2);
 }
 
+.welcome-record {
+    color: #b0b0b0;
+    font-size: 0.95rem;
+    margin-top: 0.4rem;
+}
+
 .welcome-actions {
     display: flex;
     flex-direction: column;

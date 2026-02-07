@@ -92,6 +92,31 @@ export async function getTopScores(period = 'alltime', limit = 20) {
 }
 
 /**
+ * Obtiene el mejor puntaje de un usuario específico.
+ * @param {string} userId - UID del usuario
+ * @returns {Promise<{score: number|null, title: string|null, error: object|null}>}
+ */
+export async function getUserBestScore(userId) {
+    try {
+        const snapshot = await db.collection('scores')
+            .where('userId', '==', userId)
+            .orderBy('score', 'desc')
+            .limit(1)
+            .get();
+
+        if (snapshot.empty) {
+            return { score: null, title: null, error: null };
+        }
+
+        const data = snapshot.docs[0].data();
+        return { score: data.score, title: data.title, error: null };
+    } catch (error) {
+        console.error('Error obteniendo mejor puntaje del usuario:', error);
+        return { score: null, title: null, error };
+    }
+}
+
+/**
  * Verifica si un puntaje está en el top N de un periodo.
  * @param {number} score - Puntaje a verificar
  * @param {'today'|'week'|'alltime'} period
@@ -101,14 +126,11 @@ export async function getTopScores(period = 'alltime', limit = 20) {
 export async function checkIfTopScore(score, period = 'alltime', topN = 10) {
     const { scores } = await getTopScores(period, topN);
 
-    if (scores.length < topN) {
-        return { isTop: true, position: scores.length + 1 };
-    }
+    // El score ya fue guardado con submitScore(), así que la lista
+    // retornada por getTopScores ya lo incluye. Buscamos su posición.
+    const position = scores.findIndex(s => score >= s.score) + 1;
 
-    const lowestTopScore = scores[scores.length - 1]?.score || 0;
-    if (score > lowestTopScore) {
-        // Encontrar la posición
-        const position = scores.findIndex(s => score > s.score) + 1;
+    if (position > 0 && position <= topN) {
         return { isTop: true, position };
     }
 
