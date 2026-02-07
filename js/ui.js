@@ -113,7 +113,7 @@ export function renderMiniMap() {
 
                 if (tile.isSwamp) {
                     html += `<div class="minimap-cell swamp-cell" title="Pantano intransitable">
-                        <span class="cell-icon">🐸</span>
+                        <span class="cell-icon">🟢</span>
                     </div>`;
                 } else if (tile.cleared) {
                     html += `<div class="minimap-cell cleared-cell" title="Despejada">
@@ -727,7 +727,7 @@ export function renderStartScreen(onStart) {
             <h1 class="start-title">🌲 Forest Hero 🌲</h1>
             <div class="start-story">
                 <p>Un bosque oscuro y peligroso se extiende ante ti. Criaturas de toda índole acechan entre los árboles.</p>
-                <p>En algún lugar del bosque, un <strong>Hechicero</strong> tiene cautiva a una <strong>Princesa</strong>, custodiada por su temible <strong>Dragón</strong>.</p>
+                <p>En la parte más oscura y profunda del bosque, un <strong>Hechicero</strong> tiene cautiva a una <strong>Princesa</strong>, custodiada por su temible <strong>Dragón</strong>.</p>
                 <p>Tu misión: adentrarte en el bosque, rescatar a la princesa y sacarla a salvo.</p>
                 <div class="start-image-container">
                     <img src="img/princess_captive.png" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">

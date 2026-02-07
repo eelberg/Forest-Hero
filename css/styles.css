@@ -212,10 +212,10 @@ body {
     opacity: 0.7;
 }
 
-/* Pantano */
+/* Pantano - poza de agua verde */
 .swamp-cell {
-    background: linear-gradient(135deg, #33402e, #2a3523) !important;
-    border-color: #4a5a37 !important;
+    background: linear-gradient(135deg, #1a3a2a, #0d2e1e) !important;
+    border-color: #2a5a3a !important;
     opacity: 0.85;
 }
 
@@ -677,10 +677,10 @@ body {
     background: rgba(10, 10, 30, 0.95);
     display: none;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     z-index: 1000;
     overflow-y: auto;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 .overlay-screen.visible {
@@ -692,6 +692,7 @@ body {
     max-width: 600px;
     text-align: center;
     animation: fadeIn 0.5s ease;
+    margin: auto 0;
 }
 
 .start-title {
@@ -761,6 +762,7 @@ body {
     width: 100%;
     text-align: center;
     animation: fadeIn 0.5s ease;
+    margin: auto 0;
 }
 
 .end-emoji {
