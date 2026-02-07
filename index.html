@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forest Hero - Rescata a la Princesa</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Pantalla de inicio -->
+    <!-- Pantalla de bienvenida (login/registro) -->
+    <div id="welcome-screen" class="overlay-screen"></div>
+
+    <!-- Pantalla de inicio (historia) -->
     <div id="start-screen" class="overlay-screen"></div>
 
     <!-- Pantalla de fin -->
@@ -15,6 +21,9 @@
 
     <!-- Pantalla de ayuda -->
     <div id="help-screen" class="overlay-screen"></div>
+
+    <!-- Salón de Honor -->
+    <div id="honor-hall-screen" class="overlay-screen"></div>
 
     <!-- Juego principal -->
     <div id="game-container" class="game-container">

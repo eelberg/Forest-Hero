@@ -4,6 +4,9 @@
 
 import { getState, addLog, GameState } from './game.js';
 import { MAP_SIZE } from './map.js';
+import { signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, savePseudonym, getFullUserState } from './auth.js';
+import { suggestAvailablePseudonym, checkPseudonymAvailable } from './pseudonym.js';
+import { getTopScores, submitScore, checkIfTopScore } from './leaderboard.js';
 
 // --- Colores por tier de enemigo ---
 const TIER_COLORS = {
@@ -50,9 +53,11 @@ export function initUI() {
         killList: document.getElementById('kill-list'),
         inventoryPanel: document.getElementById('inventory-panel'),
         gameContainer: document.getElementById('game-container'),
+        welcomeScreen: document.getElementById('welcome-screen'),
         startScreen: document.getElementById('start-screen'),
         endScreen: document.getElementById('end-screen'),
         helpScreen: document.getElementById('help-screen'),
+        honorHallScreen: document.getElementById('honor-hall-screen'),
         btnHelp: document.getElementById('btn-help'),
     };
 
@@ -253,6 +258,10 @@ export function renderStats() {
     else if (energyPercent < 50) energyColor = '#ff9800';
 
     elements.stats.innerHTML = `
+        <div class="stat-row pseudonym-row">
+            <span class="stat-label">🛡️ Héroe</span>
+            <span class="stat-value pseudonym-value">${p.pseudonym || 'Anónimo'}</span>
+        </div>
         <div class="stat-row">
             <span class="stat-label">⚡ Energía</span>
             <div class="stat-bar">
@@ -604,7 +613,7 @@ function attachActionListeners(callbacks) {
  * Muestra la pantalla de fin del juego.
  * @param {object} deathInfo - { deathCause, killedBy } opcional
  */
-export function renderEndScreen(scoreData, ending, deathInfo = {}) {
+export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcomeCallbacks = null) {
     let endingTitle, endingClass, endingEmoji, endingSubtitle = '';
 
     switch (ending) {
@@ -719,19 +728,536 @@ export function renderEndScreen(scoreData, ending, deathInfo = {}) {
                 ${killsHtml}
             </div>
 
+            <div id="end-score-message" class="end-score-message"></div>
             <button class="btn-action btn-restart" id="btn-restart">🔄 Jugar de Nuevo</button>
         </div>`;
 
     elements.endScreen.classList.add('visible');
     elements.gameContainer.classList.add('game-over');
 
+    // Guardar puntaje en la base de datos
+    const state = getState();
+    const pseudonym = state.player.pseudonym || 'Anónimo';
+    const userId = state.player.userId || null;
+
+    try {
+        await submitScore(scoreData, pseudonym, userId, ending);
+
+        // Verificar si entró al top
+        const { isTop, position } = await checkIfTopScore(scoreData.score, 'alltime', 10);
+        const messageEl = document.getElementById('end-score-message');
+        if (isTop && scoreData.score > 0) {
+            messageEl.innerHTML = `<p class="top-score-msg">🌟 ¡Tu puntaje entró al <strong>Top ${position}</strong> del Salón de Honor!</p>`;
+        }
+    } catch (e) {
+        console.error('Error guardando puntaje:', e);
+    }
+
+    // Botón de volver a jugar
     document.getElementById('btn-restart').addEventListener('click', () => {
-        location.reload();
+        elements.endScreen.classList.remove('visible');
+        elements.gameContainer.classList.remove('game-over');
+
+        if (welcomeCallbacks) {
+            renderWelcomeScreen(welcomeCallbacks);
+        } else {
+            location.reload();
+        }
     });
 }
 
 // ===========================
-// PANTALLA DE INICIO
+// PANTALLA DE BIENVENIDA
+// ===========================
+
+/**
+ * Renderiza la pantalla de bienvenida con opciones de registro, login, juego anónimo y salón de honor.
+ * @param {object} welcomeCallbacks - { onPlay(pseudonym, userId), onShowHonorHall() }
+ */
+export async function renderWelcomeScreen(welcomeCallbacks) {
+    const { user, profile, pseudonym } = await getFullUserState();
+
+    if (user && profile) {
+        // Usuario ya autenticado
+        renderWelcomeLoggedIn(user, profile, welcomeCallbacks);
+    } else {
+        renderWelcomeGuest(welcomeCallbacks);
+    }
+
+    elements.welcomeScreen.classList.add('visible');
+}
+
+/**
+ * Vista de bienvenida para usuario autenticado.
+ */
+function renderWelcomeLoggedIn(user, profile, welcomeCallbacks) {
+    elements.welcomeScreen.innerHTML = `
+        <div class="welcome-content">
+            <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
+            <div class="welcome-user-info">
+                <p class="welcome-greeting">Bienvenido de vuelta,</p>
+                <p class="welcome-pseudonym">🛡️ ${profile.pseudonym}</p>
+            </div>
+            <div class="start-image-container">
+                <img src="img/princess_captive.png" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+            </div>
+            <div class="welcome-actions">
+                <button class="btn-welcome btn-welcome-play" id="btn-play-logged">⚔️ Adentrarse en el Bosque</button>
+                <button class="btn-welcome btn-welcome-honor" id="btn-honor-logged">🏆 Salón de Honor</button>
+                <button class="btn-welcome btn-welcome-logout" id="btn-logout">🚪 Cerrar Sesión</button>
+            </div>
+        </div>`;
+
+    document.getElementById('btn-play-logged').addEventListener('click', () => {
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay(profile.pseudonym, user.uid);
+    });
+
+    document.getElementById('btn-honor-logged').addEventListener('click', () => {
+        renderHonorHall(() => renderWelcomeScreen(welcomeCallbacks));
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+        await signOut();
+        renderWelcomeGuest(welcomeCallbacks);
+    });
+}
+
+/**
+ * Vista de bienvenida para visitante (no autenticado).
+ */
+function renderWelcomeGuest(welcomeCallbacks) {
+    elements.welcomeScreen.innerHTML = `
+        <div class="welcome-content">
+            <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
+            <div class="welcome-story">
+                <p>Un bosque oscuro y peligroso se extiende ante ti. Criaturas de toda índole acechan entre los árboles.</p>
+                <p>En la parte más oscura y profunda del bosque, un <strong>Hechicero</strong> tiene cautiva a una <strong>Princesa</strong>, custodiada por su temible <strong>Dragón</strong>.</p>
+                <p>Tu misión: adentrarte en el bosque, rescatar a la princesa y sacarla a salvo.</p>
+                <div class="start-image-container">
+                    <img src="img/princess_captive.png" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+                </div>
+            </div>
+            <div class="welcome-actions">
+                <button class="btn-welcome btn-welcome-register" id="btn-show-register">📝 Registrarse</button>
+                <button class="btn-welcome btn-welcome-login" id="btn-show-login">🔑 Iniciar Sesión</button>
+                <button class="btn-welcome btn-welcome-anon" id="btn-play-anon">⚔️ Jugar como Anónimo</button>
+                <button class="btn-welcome btn-welcome-honor" id="btn-honor-guest">🏆 Salón de Honor</button>
+            </div>
+            <div id="auth-form-container" class="auth-form-container"></div>
+        </div>`;
+
+    document.getElementById('btn-show-register').addEventListener('click', () => {
+        showRegisterForm(welcomeCallbacks);
+    });
+
+    document.getElementById('btn-show-login').addEventListener('click', () => {
+        showLoginForm(welcomeCallbacks);
+    });
+
+    document.getElementById('btn-play-anon').addEventListener('click', () => {
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay('Anónimo', null);
+    });
+
+    document.getElementById('btn-honor-guest').addEventListener('click', () => {
+        renderHonorHall(() => renderWelcomeScreen(welcomeCallbacks));
+    });
+}
+
+/**
+ * Muestra el formulario de registro.
+ */
+function showRegisterForm(welcomeCallbacks) {
+    const container = document.getElementById('auth-form-container');
+    container.innerHTML = `
+        <div class="auth-form">
+            <h3>📝 Crear Cuenta</h3>
+            <div id="auth-error" class="auth-error"></div>
+            <div class="auth-field">
+                <label for="reg-email">Email</label>
+                <input type="email" id="reg-email" placeholder="tu@email.com" class="auth-input">
+            </div>
+            <div class="auth-field">
+                <label for="reg-password">Contraseña</label>
+                <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" class="auth-input">
+            </div>
+            <div class="auth-field">
+                <label for="reg-pseudonym">Seudónimo</label>
+                <div class="pseudonym-input-row">
+                    <input type="text" id="reg-pseudonym" placeholder="Ej: Marqués de las Montañas" class="auth-input" maxlength="60">
+                    <button class="btn-suggest" id="btn-suggest" title="Sugerir seudónimo aleatorio">🎲</button>
+                </div>
+                <span id="pseudonym-status" class="pseudonym-status"></span>
+            </div>
+            <button class="btn-auth btn-auth-primary" id="btn-register-submit">Crear Cuenta</button>
+            <div class="auth-divider"><span>o</span></div>
+            <button class="btn-auth btn-google" id="btn-google-register">
+                <svg viewBox="0 0 24 24" width="18" height="18" class="google-icon">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Registrarse con Google
+            </button>
+            <button class="btn-auth-link" id="btn-back-welcome">← Volver</button>
+        </div>`;
+
+    // Sugerir seudónimo aleatorio
+    document.getElementById('btn-suggest').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-suggest');
+        const input = document.getElementById('reg-pseudonym');
+        const status = document.getElementById('pseudonym-status');
+        btn.disabled = true;
+        btn.textContent = '⏳';
+        status.textContent = 'Buscando nombre disponible...';
+        status.className = 'pseudonym-status checking';
+
+        try {
+            const suggested = await suggestAvailablePseudonym();
+            input.value = suggested;
+            status.textContent = '✓ Disponible';
+            status.className = 'pseudonym-status available';
+        } catch (e) {
+            status.textContent = 'Error al sugerir. Intenta de nuevo.';
+            status.className = 'pseudonym-status error';
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🎲';
+    });
+
+    // Verificar disponibilidad mientras escribe
+    let checkTimeout;
+    document.getElementById('reg-pseudonym').addEventListener('input', (e) => {
+        clearTimeout(checkTimeout);
+        const value = e.target.value.trim();
+        const status = document.getElementById('pseudonym-status');
+
+        if (value.length < 3) {
+            status.textContent = value.length > 0 ? 'Mínimo 3 caracteres' : '';
+            status.className = 'pseudonym-status';
+            return;
+        }
+
+        status.textContent = 'Verificando...';
+        status.className = 'pseudonym-status checking';
+
+        checkTimeout = setTimeout(async () => {
+            const available = await checkPseudonymAvailable(value);
+            if (document.getElementById('reg-pseudonym').value.trim() === value) {
+                status.textContent = available ? '✓ Disponible' : '✗ Ya está en uso';
+                status.className = `pseudonym-status ${available ? 'available' : 'taken'}`;
+            }
+        }, 500);
+    });
+
+    // Submit registro
+    document.getElementById('btn-register-submit').addEventListener('click', async () => {
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const pseudonym = document.getElementById('reg-pseudonym').value.trim();
+        const errorEl = document.getElementById('auth-error');
+
+        errorEl.textContent = '';
+
+        if (!email || !password || !pseudonym) {
+            errorEl.textContent = 'Todos los campos son obligatorios.';
+            return;
+        }
+        if (pseudonym.length < 3) {
+            errorEl.textContent = 'El seudónimo debe tener al menos 3 caracteres.';
+            return;
+        }
+        if (password.length < 6) {
+            errorEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+            return;
+        }
+
+        const available = await checkPseudonymAvailable(pseudonym);
+        if (!available) {
+            errorEl.textContent = 'Ese seudónimo ya está en uso. Elige otro.';
+            return;
+        }
+
+        const btn = document.getElementById('btn-register-submit');
+        btn.disabled = true;
+        btn.textContent = 'Creando cuenta...';
+
+        const { user, error } = await signUpWithEmail(email, password);
+        if (error) {
+            errorEl.textContent = translateAuthError(error.message);
+            btn.disabled = false;
+            btn.textContent = 'Crear Cuenta';
+            return;
+        }
+
+        if (user) {
+            await savePseudonym(user.uid, pseudonym);
+            elements.welcomeScreen.classList.remove('visible');
+            welcomeCallbacks.onPlay(pseudonym, user.uid);
+        } else {
+            errorEl.textContent = 'Revisa tu email para confirmar la cuenta, luego inicia sesión.';
+            btn.disabled = false;
+            btn.textContent = 'Crear Cuenta';
+        }
+    });
+
+    // Google register (popup — retorna el usuario directamente)
+    document.getElementById('btn-google-register').addEventListener('click', async () => {
+        const pseudonym = document.getElementById('reg-pseudonym').value.trim();
+        const errorEl = document.getElementById('auth-error');
+
+        const { user, error } = await signInWithGoogle();
+        if (error) {
+            if (error.code !== 'auth/popup-closed-by-user') {
+                errorEl.textContent = translateAuthError(error.message);
+            }
+            return;
+        }
+
+        if (user) {
+            // Guardar seudónimo si se proporcionó uno válido
+            if (pseudonym.length >= 3) {
+                await savePseudonym(user.uid, pseudonym);
+                elements.welcomeScreen.classList.remove('visible');
+                welcomeCallbacks.onPlay(pseudonym, user.uid);
+            } else {
+                // Si no tiene seudónimo, mostrar la pantalla logueada para que juegue
+                await renderWelcomeScreen(welcomeCallbacks);
+            }
+        }
+    });
+
+    // Volver
+    document.getElementById('btn-back-welcome').addEventListener('click', () => {
+        renderWelcomeGuest(welcomeCallbacks);
+    });
+}
+
+/**
+ * Muestra el formulario de login.
+ */
+function showLoginForm(welcomeCallbacks) {
+    const container = document.getElementById('auth-form-container');
+    container.innerHTML = `
+        <div class="auth-form">
+            <h3>🔑 Iniciar Sesión</h3>
+            <div id="auth-error" class="auth-error"></div>
+            <div class="auth-field">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="tu@email.com" class="auth-input">
+            </div>
+            <div class="auth-field">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" placeholder="Tu contraseña" class="auth-input">
+            </div>
+            <button class="btn-auth btn-auth-primary" id="btn-login-submit">Iniciar Sesión</button>
+            <div class="auth-divider"><span>o</span></div>
+            <button class="btn-auth btn-google" id="btn-google-login">
+                <svg viewBox="0 0 24 24" width="18" height="18" class="google-icon">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Iniciar con Google
+            </button>
+            <button class="btn-auth-link" id="btn-back-welcome">← Volver</button>
+        </div>`;
+
+    // Submit login
+    document.getElementById('btn-login-submit').addEventListener('click', async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('auth-error');
+
+        errorEl.textContent = '';
+
+        if (!email || !password) {
+            errorEl.textContent = 'Ingresa tu email y contraseña.';
+            return;
+        }
+
+        const btn = document.getElementById('btn-login-submit');
+        btn.disabled = true;
+        btn.textContent = 'Ingresando...';
+
+        const { user, error } = await signInWithEmail(email, password);
+        if (error) {
+            errorEl.textContent = translateAuthError(error.message);
+            btn.disabled = false;
+            btn.textContent = 'Iniciar Sesión';
+            return;
+        }
+
+        // Login exitoso → mostrar pantalla de bienvenida logueada
+        await renderWelcomeScreen(welcomeCallbacks);
+    });
+
+    // Google login (popup — retorna el usuario directamente)
+    document.getElementById('btn-google-login').addEventListener('click', async () => {
+        const errorEl = document.getElementById('auth-error');
+        const { user, error } = await signInWithGoogle();
+        if (error) {
+            if (error.code !== 'auth/popup-closed-by-user') {
+                errorEl.textContent = translateAuthError(error.message);
+            }
+            return;
+        }
+        if (user) {
+            // Login exitoso → mostrar pantalla de bienvenida logueada
+            await renderWelcomeScreen(welcomeCallbacks);
+        }
+    });
+
+    // Enter key para submit
+    const loginForm = container.querySelector('.auth-form');
+    loginForm.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('btn-login-submit').click();
+        }
+    });
+
+    // Volver
+    document.getElementById('btn-back-welcome').addEventListener('click', () => {
+        renderWelcomeGuest(welcomeCallbacks);
+    });
+}
+
+/**
+ * Traduce mensajes de error de Firebase Auth al español.
+ * Firebase usa códigos de error (error.code) pero los mensajes
+ * en error.message también son descriptivos.
+ */
+function translateAuthError(message) {
+    const translations = {
+        // Mensajes por código de Firebase
+        'Firebase: Error (auth/invalid-credential).': 'Email o contraseña incorrectos.',
+        'Firebase: Error (auth/wrong-password).': 'Contraseña incorrecta.',
+        'Firebase: Error (auth/user-not-found).': 'No existe una cuenta con ese email.',
+        'Firebase: Error (auth/email-already-in-use).': 'Ya existe una cuenta con ese email.',
+        'Firebase: Error (auth/weak-password).': 'La contraseña debe tener al menos 6 caracteres.',
+        'Firebase: Error (auth/invalid-email).': 'El formato del email no es válido.',
+        'Firebase: Error (auth/too-many-requests).': 'Demasiados intentos. Espera un momento e intenta de nuevo.',
+        'Firebase: Error (auth/popup-closed-by-user).': 'Se cerró la ventana de autenticación.',
+        'Firebase: Error (auth/network-request-failed).': 'Error de conexión. Verifica tu internet.',
+        'Firebase: Error (auth/account-exists-with-different-credential).': 'Ya existe una cuenta con ese email usando otro método de acceso.',
+    };
+    return translations[message] || message;
+}
+
+// ===========================
+// SALÓN DE HONOR
+// ===========================
+
+/**
+ * Renderiza el Salón de Honor con tabs de periodo.
+ * @param {function} onBack - Se llama al presionar "Volver"
+ */
+export async function renderHonorHall(onBack) {
+    elements.honorHallScreen.innerHTML = `
+        <div class="honor-hall-content">
+            <h1 class="honor-title">🏆 Salón de Honor</h1>
+            <div class="honor-tabs">
+                <button class="honor-tab active" data-period="alltime">🏛️ Siempre</button>
+                <button class="honor-tab" data-period="week">📅 Esta Semana</button>
+                <button class="honor-tab" data-period="today">☀️ Hoy</button>
+            </div>
+            <div id="honor-table-container" class="honor-table-container">
+                <p class="honor-loading">Cargando mejores puntajes...</p>
+            </div>
+            <button class="btn-welcome btn-welcome-back" id="btn-honor-back">← Volver</button>
+        </div>`;
+
+    elements.honorHallScreen.classList.add('visible');
+    elements.welcomeScreen.classList.remove('visible');
+
+    // Cargar scores iniciales (all time)
+    await loadHonorScores('alltime');
+
+    // Tabs
+    document.querySelectorAll('.honor-tab').forEach(tab => {
+        tab.addEventListener('click', async () => {
+            document.querySelectorAll('.honor-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            await loadHonorScores(tab.dataset.period);
+        });
+    });
+
+    // Volver
+    document.getElementById('btn-honor-back').addEventListener('click', () => {
+        elements.honorHallScreen.classList.remove('visible');
+        if (onBack) onBack();
+    });
+}
+
+/**
+ * Carga y renderiza la tabla de scores para un periodo.
+ */
+async function loadHonorScores(period) {
+    const container = document.getElementById('honor-table-container');
+    container.innerHTML = '<p class="honor-loading">Cargando...</p>';
+
+    const { scores, error } = await getTopScores(period, 20);
+
+    if (error) {
+        container.innerHTML = '<p class="honor-empty">Error al cargar los puntajes. Intenta de nuevo.</p>';
+        return;
+    }
+
+    if (scores.length === 0) {
+        const periodText = {
+            today: 'hoy',
+            week: 'esta semana',
+            alltime: '',
+        };
+        container.innerHTML = `<p class="honor-empty">No hay puntajes registrados ${periodText[period] || ''}. ¡Sé el primero!</p>`;
+        return;
+    }
+
+    let html = `
+        <table class="honor-table">
+            <thead>
+                <tr>
+                    <th class="honor-col-pos">#</th>
+                    <th class="honor-col-name">Héroe</th>
+                    <th class="honor-col-score">Puntaje</th>
+                    <th class="honor-col-title">Título</th>
+                    <th class="honor-col-princess">👸</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    scores.forEach((s, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+        const princessIcon = s.has_princess ? '✅' : '❌';
+        html += `
+            <tr class="${i < 3 ? 'honor-top-3' : ''}">
+                <td class="honor-col-pos">${medal}</td>
+                <td class="honor-col-name">${escapeHtml(s.pseudonym)}</td>
+                <td class="honor-col-score">${s.score}</td>
+                <td class="honor-col-title">${escapeHtml(s.title)}</td>
+                <td class="honor-col-princess">${princessIcon}</td>
+            </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+/**
+ * Escapa HTML para prevenir XSS en seudónimos.
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ===========================
+// PANTALLA DE INICIO (historia pre-juego)
 // ===========================
 
 export function renderStartScreen(onStart) {

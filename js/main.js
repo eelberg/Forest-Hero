@@ -3,7 +3,12 @@
 // ===========================================
 
 import { initGame, getState, addLog, movePlayer, playerFight, playerFlee, playerBribe, useItem, enterTile, calculateScore, GameState } from './game.js';
-import { initUI, renderStartScreen, refreshUI, renderEndScreen } from './ui.js';
+import { initUI, renderWelcomeScreen, refreshUI, renderEndScreen } from './ui.js';
+import { getFullUserState } from './auth.js';
+
+// --- Estado de sesión ---
+let currentPseudonym = 'Anónimo';
+let currentUserId = null;
 
 // --- Callbacks para la UI ---
 const callbacks = {
@@ -15,14 +20,24 @@ const callbacks = {
     onRefresh: () => refreshUI(callbacks),
 };
 
+// --- Callbacks para la pantalla de bienvenida ---
+const welcomeCallbacks = {
+    onPlay: startGame,
+};
+
 // --- Inicialización ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initUI();
-    renderStartScreen(startGame);
+
+    // Mostrar pantalla de bienvenida
+    await renderWelcomeScreen(welcomeCallbacks);
 });
 
-function startGame() {
-    initGame();
+function startGame(pseudonym, userId) {
+    currentPseudonym = pseudonym || 'Anónimo';
+    currentUserId = userId || null;
+
+    initGame(currentPseudonym, currentUserId);
     addLog('🌲 Te adentras en un bosque oscuro y misterioso. Criaturas peligrosas acechan entre las sombras.', 'intro');
     addLog('🧭 Usa los botones de dirección para explorar. Tu objetivo: encontrar y rescatar a la princesa.', 'intro');
 
@@ -47,7 +62,7 @@ function showGameOverTransition(scoreData, ending, deathInfo = {}) {
         </div>`;
 
     document.getElementById('btn-show-result').addEventListener('click', () => {
-        renderEndScreen(scoreData, ending, deathInfo);
+        renderEndScreen(scoreData, ending, deathInfo, welcomeCallbacks);
     });
 }
 

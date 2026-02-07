@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Perfiles de usuario
+    match /profiles/{userId} {
+      // Cualquiera puede leer perfiles (para el salón de honor y verificar seudónimos)
+      allow read: if true;
+      // Solo el usuario autenticado puede escribir su propio perfil
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Puntajes del juego
+    match /scores/{scoreId} {
+      // Cualquiera puede leer puntajes (salón de honor público)
+      allow read: if true;
+      // Cualquiera puede crear puntajes (incluyendo anónimos)
+      allow create: if true;
+      // No se permite actualizar ni eliminar puntajes
+      allow update, delete: if false;
+    }
+  }
+}

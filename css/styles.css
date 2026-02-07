@@ -761,6 +761,493 @@ body {
     background: #5a9fd4;
 }
 
+/* --- Pseudónimo en Stats --- */
+.pseudonym-row {
+    background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,152,0,0.05));
+    border-radius: 4px;
+    padding: 0.35rem 0.4rem !important;
+    margin-bottom: 0.2rem;
+}
+
+.pseudonym-value {
+    color: var(--accent-gold) !important;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    display: inline-block;
+    text-align: right;
+}
+
+/* --- Pantalla de bienvenida --- */
+.welcome-content {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+    margin: auto 0;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+
+.welcome-story {
+    text-align: left;
+    background: var(--bg-panel);
+    padding: 1.2rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+    font-size: 0.92rem;
+}
+
+.welcome-story p {
+    margin-bottom: 0.5rem;
+}
+
+.welcome-user-info {
+    background: var(--bg-panel);
+    padding: 1.2rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--accent-gold);
+    margin-bottom: 1rem;
+    box-shadow: 0 0 15px rgba(255,215,0,0.1);
+}
+
+.welcome-greeting {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+}
+
+.welcome-pseudonym {
+    color: var(--accent-gold);
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(255,215,0,0.2);
+}
+
+.welcome-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 1.2rem 0;
+}
+
+.btn-welcome {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: all 0.3s;
+    color: white;
+    background: var(--bg-card);
+}
+
+.btn-welcome:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.btn-welcome-play {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    border-color: var(--accent-green);
+    font-size: 1.15rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 0 15px rgba(76,175,80,0.3);
+}
+
+.btn-welcome-play:hover {
+    box-shadow: 0 5px 20px rgba(76,175,80,0.5);
+}
+
+.btn-welcome-register {
+    background: linear-gradient(135deg, #0d47a1, #1565c0);
+    border-color: var(--accent-blue);
+}
+
+.btn-welcome-login {
+    background: linear-gradient(135deg, #4a148c, #6a1b9a);
+    border-color: var(--accent-purple);
+}
+
+.btn-welcome-anon {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 10px rgba(76,175,80,0.2);
+}
+
+.btn-welcome-honor {
+    background: linear-gradient(135deg, #e65100, #ef6c00);
+    border-color: #ff9800;
+}
+
+.btn-welcome-logout {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.btn-welcome-back {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* --- Formularios de Auth --- */
+.auth-form-container {
+    margin-top: 0.5rem;
+}
+
+.auth-form {
+    background: var(--bg-panel);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    text-align: left;
+    animation: fadeIn 0.3s ease;
+}
+
+.auth-form h3 {
+    text-align: center;
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+}
+
+.auth-error {
+    color: var(--accent-red);
+    font-size: 0.85rem;
+    text-align: center;
+    min-height: 1.2em;
+    margin-bottom: 0.5rem;
+}
+
+.auth-field {
+    margin-bottom: 0.8rem;
+}
+
+.auth-field label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.auth-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(33,150,243,0.15);
+}
+
+.auth-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.pseudonym-input-row {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.pseudonym-input-row .auth-input {
+    flex: 1;
+}
+
+.btn-suggest {
+    padding: 0.5rem 0.7rem;
+    background: var(--bg-card);
+    border: 1px solid var(--accent-gold);
+    border-radius: 6px;
+    color: var(--accent-gold);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.btn-suggest:hover {
+    background: rgba(255,215,0,0.1);
+}
+
+.btn-suggest:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.pseudonym-status {
+    display: block;
+    font-size: 0.75rem;
+    margin-top: 0.2rem;
+    min-height: 1em;
+}
+
+.pseudonym-status.checking { color: var(--text-secondary); }
+.pseudonym-status.available { color: var(--accent-green); }
+.pseudonym-status.taken { color: var(--accent-red); }
+.pseudonym-status.error { color: var(--accent-red); }
+
+.btn-auth {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-auth:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.btn-auth-primary {
+    background: linear-gradient(135deg, #1565c0, #1976d2);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+.btn-auth-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1976d2, #1e88e5);
+    transform: translateY(-1px);
+}
+
+.btn-google {
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.btn-google:hover:not(:disabled) {
+    background: #f8f8f8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.google-icon {
+    flex-shrink: 0;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 0.8rem 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.auth-divider span {
+    background: var(--bg-panel);
+    padding: 0 0.8rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    position: relative;
+}
+
+.btn-auth-link {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-family: inherit;
+    margin-top: 0.5rem;
+    transition: color 0.2s;
+}
+
+.btn-auth-link:hover {
+    color: var(--accent-blue);
+}
+
+/* --- Salón de Honor --- */
+.honor-hall-content {
+    max-width: 650px;
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+    margin: auto 0;
+}
+
+.honor-title {
+    font-size: 2rem;
+    color: var(--accent-gold);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 15px rgba(255,215,0,0.3);
+}
+
+.honor-tabs {
+    display: flex;
+    gap: 0.3rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.honor-tab {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.honor-tab:hover {
+    background: rgba(255,215,0,0.1);
+    border-color: var(--accent-gold);
+}
+
+.honor-tab.active {
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,152,0,0.1));
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    font-weight: 700;
+}
+
+.honor-table-container {
+    background: var(--bg-panel);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    padding: 0.8rem;
+    min-height: 200px;
+    margin-bottom: 1rem;
+}
+
+.honor-loading, .honor-empty {
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 2rem 0;
+}
+
+.honor-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.honor-table thead th {
+    color: var(--accent-gold);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 0.4rem;
+    border-bottom: 2px solid var(--border-color);
+    text-align: left;
+}
+
+.honor-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s;
+}
+
+.honor-table tbody tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.honor-top-3 {
+    background: rgba(255,215,0,0.04) !important;
+}
+
+.honor-table td {
+    padding: 0.5rem 0.4rem;
+    text-align: left;
+}
+
+.honor-col-pos {
+    width: 40px;
+    text-align: center !important;
+    font-weight: 700;
+}
+
+.honor-col-name {
+    color: var(--text-bright);
+    font-weight: 500;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.honor-col-score {
+    color: var(--accent-gold);
+    font-weight: 700;
+    width: 80px;
+}
+
+.honor-col-title {
+    color: var(--accent-purple);
+    font-size: 0.8rem;
+}
+
+.honor-col-princess {
+    width: 40px;
+    text-align: center !important;
+}
+
+/* --- Mensaje de top score en pantalla de fin --- */
+.end-score-message {
+    margin: 0.5rem 0;
+}
+
+.top-score-msg {
+    color: var(--accent-gold);
+    font-size: 1rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,152,0,0.1));
+    border: 1px solid var(--accent-gold);
+    border-radius: var(--radius);
+    animation: pulse 2s infinite;
+}
+
 /* --- Pantalla de inicio --- */
 .start-content {
     max-width: 600px;
@@ -1037,8 +1524,20 @@ body {
         max-height: 200px;
     }
 
-    .start-title {
+    .start-title, .welcome-title {
         font-size: 1.8rem;
+    }
+
+    .honor-title {
+        font-size: 1.5rem;
+    }
+
+    .honor-tabs {
+        flex-wrap: wrap;
+    }
+
+    .welcome-pseudonym {
+        font-size: 1.1rem;
     }
 }
 

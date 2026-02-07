@@ -25,8 +25,10 @@ let state = null;
 
 /**
  * Inicializa un nuevo juego.
+ * @param {string} pseudonym - Seudónimo del jugador (default 'Anónimo')
+ * @param {string|null} userId - UUID del usuario autenticado (null para anónimos)
  */
-export function initGame() {
+export function initGame(pseudonym = 'Anónimo', userId = null) {
     const { grid, playerStart, princessPos } = generateMap();
 
     state = {
@@ -39,6 +41,8 @@ export function initGame() {
             hasPrincess: false,
             inventory: [],      // Tesoros escondidos
             kills: [],          // { enemy, treasure } de criaturas matadas
+            pseudonym,          // Seudónimo del jugador
+            userId,             // UUID del usuario (null si anónimo)
         },
         map: {
             grid,
@@ -599,5 +603,7 @@ export function calculateScore() {
         title,
         hasPrincess: state.player.hasPrincess,
         energy: state.player.energy,
+        pseudonym: state.player.pseudonym,
+        userId: state.player.userId,
     };
 }
