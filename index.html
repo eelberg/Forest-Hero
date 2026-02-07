@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Hero - Rescata a la Princesa</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Pantalla de inicio -->
+    <div id="start-screen" class="overlay-screen"></div>
+
+    <!-- Pantalla de fin -->
+    <div id="end-screen" class="overlay-screen"></div>
+
+    <!-- Juego principal -->
+    <div id="game-container" class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <h1>🌲 Forest Hero 🌲</h1>
+        </header>
+
+        <!-- Layout principal -->
+        <div class="game-layout">
+            <!-- Columna izquierda: Narrativa -->
+            <div class="column-left">
+                <div class="panel narrative-panel">
+                    <h3 class="panel-title">📜 Crónica del Bosque</h3>
+                    <div id="narrative" class="narrative-scroll"></div>
+                </div>
+            </div>
+
+            <!-- Columna derecha: Mapa + Stats + Inventario + Kills -->
+            <div class="column-right">
+                <div class="panel minimap-panel">
+                    <h3 class="panel-title">🗺️ Alrededores</h3>
+                    <div id="minimap"></div>
+                </div>
+
+                <div class="panel stats-panel">
+                    <h3 class="panel-title">📊 Estado</h3>
+                    <div id="stats"></div>
+                </div>
+
+                <div class="panel inventory-panel-container">
+                    <div id="inventory-panel"></div>
+                </div>
+
+                <div class="panel kills-panel">
+                    <div id="kill-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zona inferior: Criatura + Acciones -->
+        <div class="game-bottom">
+            <div class="panel creature-panel">
+                <div id="creature-display"></div>
+            </div>
+
+            <div class="panel actions-panel">
+                <div id="actions"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
