@@ -98,18 +98,25 @@ export async function getTopScores(period = 'alltime', limit = 20) {
  */
 export async function getUserBestScore(userId) {
     try {
+        // Solo filtramos por userId sin orderBy para evitar requerir
+        // un índice compuesto en Firestore. Ordenamos client-side.
         const snapshot = await db.collection('scores')
             .where('userId', '==', userId)
-            .orderBy('score', 'desc')
-            .limit(1)
             .get();
 
         if (snapshot.empty) {
             return { score: null, title: null, error: null };
         }
 
-        const data = snapshot.docs[0].data();
-        return { score: data.score, title: data.title, error: null };
+        let best = null;
+        snapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (!best || data.score > best.score) {
+                best = data;
+            }
+        });
+
+        return { score: best.score, title: best.title, error: null };
     } catch (error) {
         console.error('Error obteniendo mejor puntaje del usuario:', error);
         return { score: null, title: null, error };
