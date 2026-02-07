@@ -778,9 +778,13 @@ export async function renderWelcomeScreen(welcomeCallbacks) {
     const { user, profile, pseudonym } = await getFullUserState();
 
     if (user && profile) {
-        // Usuario ya autenticado
+        // Usuario autenticado con perfil completo
         renderWelcomeLoggedIn(user, profile, welcomeCallbacks);
+    } else if (user && !profile) {
+        // Usuario autenticado pero sin perfil → pedir seudónimo
+        renderWelcomeNeedsProfile(user, welcomeCallbacks);
     } else {
+        // Visitante
         renderWelcomeGuest(welcomeCallbacks);
     }
 
@@ -821,6 +825,142 @@ function renderWelcomeLoggedIn(user, profile, welcomeCallbacks) {
         await signOut();
         renderWelcomeGuest(welcomeCallbacks);
     });
+}
+
+/**
+ * Vista para usuario autenticado que aún no tiene perfil (seudónimo).
+ * Le pedimos que elija un seudónimo antes de jugar.
+ */
+function renderWelcomeNeedsProfile(user, welcomeCallbacks) {
+    const displayName = user.displayName || user.email || 'Héroe';
+    elements.welcomeScreen.innerHTML = `
+        <div class="welcome-content">
+            <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
+            <div class="welcome-user-info">
+                <p class="welcome-greeting">¡Bienvenido, ${displayName}!</p>
+                <p style="color: #b0b0b0; font-size: 0.9rem; margin-top: 0.5rem;">Elige un seudónimo para ser recordado en el Salón de Honor.</p>
+            </div>
+            <div class="auth-form">
+                <div id="auth-error" class="auth-error"></div>
+                <div class="auth-field">
+                    <label for="profile-pseudonym">Seudónimo</label>
+                    <div class="pseudonym-input-row">
+                        <input type="text" id="profile-pseudonym" placeholder="Ej: Marqués de las Montañas" class="auth-input" maxlength="60">
+                        <button class="btn-suggest" id="btn-suggest-profile" title="Sugerir seudónimo aleatorio">🎲</button>
+                    </div>
+                    <span id="pseudonym-status" class="pseudonym-status"></span>
+                </div>
+                <button class="btn-auth btn-auth-primary" id="btn-save-profile">🛡️ Guardar y Jugar</button>
+                <button class="btn-auth-link" id="btn-play-without-profile">Jugar sin seudónimo por ahora</button>
+                <div class="auth-divider"><span>o</span></div>
+                <button class="btn-auth-link" id="btn-logout-profile">🚪 Cerrar Sesión</button>
+            </div>
+        </div>`;
+
+    // Sugerir seudónimo aleatorio
+    document.getElementById('btn-suggest-profile').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-suggest-profile');
+        const input = document.getElementById('profile-pseudonym');
+        const status = document.getElementById('pseudonym-status');
+        btn.disabled = true;
+        btn.textContent = '⏳';
+        status.textContent = 'Buscando nombre disponible...';
+        status.className = 'pseudonym-status checking';
+
+        try {
+            const suggested = await suggestAvailablePseudonym();
+            input.value = suggested;
+            status.textContent = '✓ Disponible';
+            status.className = 'pseudonym-status available';
+        } catch (e) {
+            status.textContent = 'Error al sugerir. Intenta de nuevo.';
+            status.className = 'pseudonym-status error';
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🎲';
+    });
+
+    // Verificar disponibilidad mientras escribe
+    let checkTimeout;
+    document.getElementById('profile-pseudonym').addEventListener('input', (e) => {
+        clearTimeout(checkTimeout);
+        const value = e.target.value.trim();
+        const status = document.getElementById('pseudonym-status');
+
+        if (value.length < 3) {
+            status.textContent = value.length > 0 ? 'Mínimo 3 caracteres' : '';
+            status.className = 'pseudonym-status';
+            return;
+        }
+
+        status.textContent = 'Verificando...';
+        status.className = 'pseudonym-status checking';
+
+        checkTimeout = setTimeout(async () => {
+            const available = await checkPseudonymAvailable(value);
+            if (document.getElementById('profile-pseudonym')?.value.trim() === value) {
+                status.textContent = available ? '✓ Disponible' : '✗ Ya está en uso';
+                status.className = `pseudonym-status ${available ? 'available' : 'taken'}`;
+            }
+        }, 500);
+    });
+
+    // Guardar perfil y jugar
+    document.getElementById('btn-save-profile').addEventListener('click', async () => {
+        const pseudonym = document.getElementById('profile-pseudonym').value.trim();
+        const errorEl = document.getElementById('auth-error');
+        errorEl.textContent = '';
+
+        if (!pseudonym || pseudonym.length < 3) {
+            errorEl.textContent = 'El seudónimo debe tener al menos 3 caracteres.';
+            return;
+        }
+
+        const available = await checkPseudonymAvailable(pseudonym);
+        if (!available) {
+            errorEl.textContent = 'Ese seudónimo ya está en uso. Elige otro.';
+            return;
+        }
+
+        const btn = document.getElementById('btn-save-profile');
+        btn.disabled = true;
+        btn.textContent = 'Guardando...';
+
+        const result = await savePseudonym(user.uid, pseudonym);
+        if (result.error) {
+            errorEl.textContent = 'Error al guardar el seudónimo. Intenta de nuevo.';
+            btn.disabled = false;
+            btn.textContent = '🛡️ Guardar y Jugar';
+            return;
+        }
+
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay(pseudonym, user.uid);
+    });
+
+    // Jugar sin seudónimo
+    document.getElementById('btn-play-without-profile').addEventListener('click', () => {
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay(displayName, user.uid);
+    });
+
+    // Cerrar sesión
+    document.getElementById('btn-logout-profile').addEventListener('click', async () => {
+        await signOut();
+        renderWelcomeGuest(welcomeCallbacks);
+    });
+
+    // Enter key para submit
+    const form = elements.welcomeScreen.querySelector('.auth-form');
+    form.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+            document.getElementById('btn-save-profile').click();
+        }
+    });
+
+    // Auto-sugerir un seudónimo al cargar
+    document.getElementById('btn-suggest-profile').click();
 }
 
 /**
