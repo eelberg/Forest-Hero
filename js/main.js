@@ -39,6 +39,7 @@ function startGame(pseudonym, userId) {
 
     initGame(currentPseudonym, currentUserId);
     addLog('🌲 Te adentras en un bosque oscuro y misterioso. Criaturas peligrosas acechan entre las sombras.', 'intro');
+    addLog('🧙‍♂️ Se cuenta que un hechicero malvado tiene cautiva a una princesa en la parte más oscura y tenebrosa del bosque.', 'intro');
     addLog('🧭 Usa los botones de dirección para explorar. Tu objetivo: encontrar y rescatar a la princesa.', 'intro');
 
     refreshUI(callbacks);
