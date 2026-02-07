@@ -520,12 +520,12 @@ export function useItem(itemIndex) {
             if (!hasDragon) {
                 addLog(
                     `⚔️ Levantas la Espada del maestro de dragones, pero ` +
-                    `${enemy.fullName} no es un dragón. La espada no tiene efecto especial... ` +
-                    `pero igual la usas para cortar a tu enemigo en dos.`,
+                    `${enemy.fullName} no es un dragón. La hoja permanece apagada... ` +
+                    `la espada se desmorona en tus manos. Has desperdiciado un arma legendaria.`,
                     'item_use'
                 );
-                // Aún así, mata al enemigo (es una espada mágica después de todo)
-                return handleFightWin();
+                // No mata al enemigo; el item ya fue consumido (un solo uso)
+                return { result: 'wasted' };
             }
             addLog(
                 `⚔️ ¡Desenvainas la Espada del maestro de dragones! La hoja brilla con fuego azul. ` +
