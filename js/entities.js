@@ -69,6 +69,13 @@ export const HIDDEN_TREASURES = [
         description: 'Si la usas... explotas y mueres.',
         effect: 'self_destruct'
     },
+    {
+        id: 'elixir_vida',
+        name: 'Elixir de la vida',
+        emoji: '🧪',
+        description: 'Recuperas toda tu energía original (1000).',
+        effect: 'full_heal'
+    },
 ];
 
 // --- Funciones de creación ---

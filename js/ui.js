@@ -64,10 +64,10 @@ export function initUI() {
  * Vegetación progresiva: más densa = más peligro.
  */
 function getForestIcon(tier) {
-    if (tier <= 30) return '🌱';      // Pasto / hierba baja
-    if (tier <= 50) return '🌿';      // Plantas / vegetación media
-    if (tier <= 80) return '🪴';      // Arbusto / vegetación densa
-    return '🌳';                       // Árboles / bosque cerrado
+    if (tier <= 30) return '🌾';      // Campo abierto / pasto
+    if (tier <= 50) return '🌲';      // Bosque de pinos
+    if (tier <= 80) return '🌳';      // Bosque denso
+    return '🕳️';                      // Cueva / guarida oscura
 }
 
 /**

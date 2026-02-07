@@ -67,3 +67,11 @@ export function shuffle(arr) {
 export function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
+
+/**
+ * Función sigmoide: transición suave entre 0 y 1.
+ * σ(x) = 1 / (1 + e^(-x))
+ */
+export function sigmoid(x) {
+    return 1 / (1 + Math.exp(-x));
+}

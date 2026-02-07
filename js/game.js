@@ -553,6 +553,18 @@ export function useItem(itemIndex) {
             return handleDeath('pill');
         }
 
+        case 'full_heal': {
+            // Elixir de la vida: restaurar toda la energía
+            const energiaAnterior = state.player.energy;
+            state.player.energy = 1000;
+            addLog(
+                `🧪 ¡Bebes el Elixir de la vida! Una energía cálida recorre todo tu cuerpo. ` +
+                `Tu energía se restaura por completo (${energiaAnterior} → 1000).`,
+                'item_use'
+            );
+            return { result: 'healed' };
+        }
+
         default:
             return { result: 'invalid' };
     }
