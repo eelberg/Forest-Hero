@@ -202,8 +202,8 @@ body {
 }
 
 .border-cell {
-    background: linear-gradient(135deg, #37474f, #455a64) !important;
-    border-color: #607d8b !important;
+    background: linear-gradient(135deg, #4a4030, #5a5040) !important;
+    border-color: #8a7a5e !important;
 }
 
 .cleared-cell {
@@ -214,23 +214,28 @@ body {
 
 /* Pantano */
 .swamp-cell {
-    background: linear-gradient(135deg, #4e342e, #3e2723) !important;
-    border-color: #5d4037 !important;
-    opacity: 0.8;
+    background: linear-gradient(135deg, #33402e, #2a3523) !important;
+    border-color: #4a5a37 !important;
+    opacity: 0.85;
 }
 
-/* Bosque por densidad (tier) - de abierto a tupido */
-.forest-tier-0   { background: #2e7d32 !important; }
-.forest-tier-10  { background: #2b6e2b !important; }
-.forest-tier-20  { background: #256025 !important; }
-.forest-tier-30  { background: #1f521f !important; }
-.forest-tier-40  { background: #1a451a !important; }
-.forest-tier-50  { background: #153815 !important; }
-.forest-tier-60  { background: #112c11 !important; }
-.forest-tier-70  { background: #0d220d !important; }
-.forest-tier-80  { background: #0a1a0a !important; }
-.forest-tier-90  { background: #0f0a15 !important; }
-.forest-tier-100 { background: #1a0a20 !important; }
+/* Bosque por nivel de riesgo (4 niveles) - Fondos sutiles, el ícono es la pista */
+.forest-open {
+    background: linear-gradient(135deg, #1b3d1b, #244a24) !important;
+    border-color: #2d5c2d !important;
+}
+.forest-plants {
+    background: linear-gradient(135deg, #183818, #214421) !important;
+    border-color: #2a542a !important;
+}
+.forest-shrubs {
+    background: linear-gradient(135deg, #153315, #1e3e1e) !important;
+    border-color: #274c27 !important;
+}
+.forest-dense {
+    background: linear-gradient(135deg, #122e12, #1b381b) !important;
+    border-color: #244424 !important;
+}
 
 .unknown-cell {
     opacity: 0.85;
@@ -928,18 +933,28 @@ body {
 
 /* --- Responsive --- */
 @media (max-width: 768px) {
+    /* display:contents hace que column-left y column-right
+       participen directamente en el flex de game-container,
+       permitiendo reordenar con order */
     .game-layout {
+        display: contents;
+    }
+
+    /* Orden móvil: 1) Crónica → 2) Criatura+Acciones → 3) Mapa+Stats */
+    .column-left {
+        order: 1;
+    }
+
+    .game-bottom {
+        order: 2;
         grid-template-columns: 1fr;
     }
 
     .column-right {
+        order: 3;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0.5rem;
-    }
-
-    .game-bottom {
-        grid-template-columns: 1fr;
     }
 
     .narrative-scroll {

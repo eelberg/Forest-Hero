@@ -59,20 +59,26 @@ export function initUI() {
 // MINI-MAPA 3x3
 // ===========================
 
-// Iconos de bosque según densidad (tier bajo = abierto, tier alto = tupido)
-const FOREST_ICONS = {
-    0:   '🌿',   // Prado abierto
-    10:  '🌱',   // Vegetación baja
-    20:  '☘️',   // Arbustos
-    30:  '🌳',   // Árboles dispersos
-    40:  '🌲',   // Bosque
-    50:  '🌲',   // Bosque denso
-    60:  '🏚️',  // Zona sombría
-    70:  '⛰️',   // Rocas y bosque
-    80:  '🌑',   // Oscuridad densa
-    90:  '🔥',   // Resplandor ominoso
-    100: '💀',   // Zona de muerte
-};
+/**
+ * Icono de bosque según nivel de riesgo (4 niveles).
+ * Vegetación progresiva: más densa = más peligro.
+ */
+function getForestIcon(tier) {
+    if (tier <= 30) return '🌱';      // Pasto / hierba baja
+    if (tier <= 50) return '🌿';      // Plantas / vegetación media
+    if (tier <= 80) return '🪴';      // Arbusto / vegetación densa
+    return '🌳';                       // Árboles / bosque cerrado
+}
+
+/**
+ * Clase CSS de fondo según nivel de riesgo (4 niveles).
+ */
+function getForestClass(tier) {
+    if (tier <= 30) return 'forest-open';
+    if (tier <= 50) return 'forest-plants';
+    if (tier <= 80) return 'forest-shrubs';
+    return 'forest-dense';
+}
 
 const VIEWPORT_RADIUS = 2; // 2 casillas en cada dirección = 5x5
 
@@ -100,14 +106,14 @@ export function renderMiniMap() {
             } else if (r < 0 || r >= MAP_SIZE || c < 0 || c >= MAP_SIZE) {
                 // Fuera del mapa: salida
                 html += `<div class="minimap-cell border-cell" title="Salida del bosque">
-                    <span class="cell-icon">🚪</span>
+                    <span class="cell-icon">🌄</span>
                 </div>`;
             } else {
                 const tile = grid[r][c];
 
                 if (tile.isSwamp) {
                     html += `<div class="minimap-cell swamp-cell" title="Pantano intransitable">
-                        <span class="cell-icon">🟤</span>
+                        <span class="cell-icon">🐸</span>
                     </div>`;
                 } else if (tile.cleared) {
                     html += `<div class="minimap-cell cleared-cell" title="Despejada">
@@ -123,9 +129,9 @@ export function renderMiniMap() {
                 } else {
                     // No visitada: icono de bosque según densidad/peligro
                     const tier = tile.enemy.tier;
-                    const color = TIER_COLORS[tier] || '#666';
-                    const forestIcon = FOREST_ICONS[tier] || '🌲';
-                    html += `<div class="minimap-cell unknown-cell forest-tier-${tier}" style="border-color: ${color}" title="Bosque misterioso">
+                    const forestIcon = getForestIcon(tier);
+                    const forestClass = getForestClass(tier);
+                    html += `<div class="minimap-cell unknown-cell ${forestClass}" title="Bosque misterioso">
                         <span class="cell-icon">${forestIcon}</span>
                     </div>`;
                 }
