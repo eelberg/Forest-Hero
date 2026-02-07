@@ -29,6 +29,28 @@ function startGame() {
     refreshUI(callbacks);
 }
 
+// --- Transición de fin de juego ---
+
+/**
+ * Muestra la UI actualizada con el último mensaje narrativo y un botón
+ * "Ver resultado" en el panel de acciones, para que el jugador pueda
+ * leer la crónica antes de ver la pantalla final.
+ */
+function showGameOverTransition(scoreData, ending, deathInfo = {}) {
+    refreshUI(callbacks);
+
+    const actionsPanel = document.getElementById('actions');
+    actionsPanel.innerHTML = `
+        <div class="action-group">
+            <h4>📜 Lee la crónica antes de continuar...</h4>
+            <button class="btn-action btn-confirm" id="btn-show-result">🏁 Ver resultado final</button>
+        </div>`;
+
+    document.getElementById('btn-show-result').addEventListener('click', () => {
+        renderEndScreen(scoreData, ending, deathInfo);
+    });
+}
+
 // --- Handlers ---
 
 function handleMove(direction) {
@@ -36,8 +58,7 @@ function handleMove(direction) {
 
     if (result.gameOver) {
         const scoreData = calculateScore();
-        refreshUI(callbacks);
-        renderEndScreen(scoreData, result.ending);
+        showGameOverTransition(scoreData, result.ending);
         return;
     }
 
@@ -53,8 +74,7 @@ function handleFight(energy) {
 
     if (result.result === 'death') {
         const scoreData = calculateScore();
-        refreshUI(callbacks);
-        renderEndScreen(scoreData, result.ending, result);
+        showGameOverTransition(scoreData, result.ending, result);
         return;
     }
 
@@ -66,8 +86,7 @@ function handleFlee() {
 
     if (result.result === 'death') {
         const scoreData = calculateScore();
-        refreshUI(callbacks);
-        renderEndScreen(scoreData, result.ending, result);
+        showGameOverTransition(scoreData, result.ending, result);
         return;
     }
 
@@ -77,8 +96,7 @@ function handleFlee() {
 
         if (enterResult.gameOver) {
             const scoreData = calculateScore();
-            refreshUI(callbacks);
-            renderEndScreen(scoreData, enterResult.ending);
+            showGameOverTransition(scoreData, enterResult.ending);
             return;
         }
     }
@@ -97,8 +115,7 @@ function handleUseItem(itemIndex) {
 
     if (result.result === 'death') {
         const scoreData = calculateScore();
-        refreshUI(callbacks);
-        renderEndScreen(scoreData, result.ending, result);
+        showGameOverTransition(scoreData, result.ending, result);
         return;
     }
 
@@ -106,8 +123,7 @@ function handleUseItem(itemIndex) {
         const enterResult = enterTile(result.newPos);
         if (enterResult.gameOver) {
             const scoreData = calculateScore();
-            refreshUI(callbacks);
-            renderEndScreen(scoreData, enterResult.ending);
+            showGameOverTransition(scoreData, enterResult.ending);
             return;
         }
     }

@@ -580,7 +580,8 @@ export function calculateScore() {
     const totalTreasureValue = kills.reduce((sum, k) => sum + k.treasureValue, 0);
 
     let title;
-    const score = totalGold + totalKillValue;
+    const rawScore = totalGold + totalKillValue;
+    const score = state.player.hasPrincess ? rawScore : Math.floor(rawScore / 5);
 
     if (score >= 1000) title = 'Leyenda Inmortal';
     else if (score >= 700) title = 'Héroe del Bosque';
