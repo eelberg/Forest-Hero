@@ -10,17 +10,17 @@ import { getTopScores, submitScore, checkIfTopScore, getUserBestScore } from './
 
 // --- Colores por tier de enemigo ---
 const TIER_COLORS = {
-    0:   '#6aaa64',  // Verde claro (ratón)
-    10:  '#7cb342',  // Verde
-    20:  '#9e9d24',  // Amarillo verdoso
-    30:  '#f9a825',  // Amarillo
-    40:  '#ff8f00',  // Naranja
-    50:  '#ef6c00',  // Naranja oscuro
-    60:  '#d84315',  // Rojo naranja
-    70:  '#c62828',  // Rojo
-    80:  '#ad1457',  // Rojo oscuro
-    90:  '#6a1b9a',  // Púrpura
-    100: '#311b92',  // Púrpura oscuro
+    0:   '#81c784',  // Verde claro (ratón)
+    10:  '#aed581',  // Verde lima
+    20:  '#dce775',  // Amarillo verdoso
+    30:  '#ffd54f',  // Amarillo
+    40:  '#ffb74d',  // Naranja
+    50:  '#ff8a65',  // Naranja claro
+    60:  '#e57373',  // Rojo claro
+    70:  '#ef5350',  // Rojo
+    80:  '#f06292',  // Rosa fuerte
+    90:  '#ce93d8',  // Púrpura claro
+    100: '#b39ddb',  // Púrpura lavanda
 };
 
 const TIER_BG_COLORS = {
