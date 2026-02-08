@@ -250,9 +250,9 @@ export function playerFight(energyToSpend) {
         return handleFightWin();
     } else if (result === FIGHT_RESULT.DRAW) {
         addLog(
-            `⚔️ Inviertes ${energyToSpend} de energía en el combate contra ${enemy.fullName} ` +
+            `⚔️ Gastas ${energyToSpend} de energía en el combate contra el ${enemy.fullName} ` +
             `(fuerza: ${enemy.totalStrength}). El combate es parejo y ninguno cede. ` +
-            `Pierdes la energía invertida. Te quedan ${state.player.energy} unidades.`,
+            `Te quedan ${state.player.energy} unidades.`,
             'combat_draw'
         );
         state.phase = GameState.PHASE.ENCOUNTER;
@@ -291,10 +291,10 @@ function handleFightWin() {
     tile.enemy.defeated = true;
 
     let logMsg = treasure
-        ? `⚔️ ¡Victoria! Derrotas a ${enemy.fullName}. Obtienes ${treasure.emoji} ${treasure.name} (${treasure.value} monedas).`
-        : `⚔️ ¡Victoria! Derrotas a ${enemy.fullName}.`;
+        ? `⚔️ ¡Victoria! Derrotas al ${enemy.fullName}. Obtienes ${treasure.emoji} ${treasure.name} (${treasure.value} monedas).`
+        : `⚔️ ¡Victoria! Derrotas al ${enemy.fullName}.`;
     if (recoveredGold > 0) {
-        logMsg += ` Recuperas ${recoveredGold} monedas de sobornos fallidos.`;
+        logMsg += ` Recuperas ${recoveredGold} monedas de intentos de soborno.`;
     }
 
     addLog(logMsg, 'combat_win');
@@ -334,17 +334,17 @@ function handleDeath(cause) {
 
     let deathMsg;
     if (cause === 'flee') {
-        deathMsg = `💀 Intentas correr pero ${state.encounter.enemy.fullName} te alcanza y te da muerte.`;
+        deathMsg = `💀 Intentas correr pero el ${state.encounter.enemy.fullName} te alcanza y te da muerte.`;
     } else if (cause === 'pill') {
         deathMsg = '💊💥 Usas la píldora explosiva. Una explosión ensordecedora sacude el bosque. No queda nada de ti.';
     } else {
-        deathMsg = `💀 ${state.encounter.enemy.fullName} te derrota en combate.`;
+        deathMsg = `💀 El ${state.encounter.enemy.fullName} te derrota en combate.`;
     }
 
     if (state.player.hasPrincess) {
         deathMsg += ' La princesa, que iba contigo, también muere.';
     } else {
-        deathMsg += ' El hechicero, con una sonrisa siniestra, le sirve la princesa en bandeja de plata a su dragón. La bestia la engulle de un solo bocado y eructa satisfecha. ¡Buen provecho!';
+        deathMsg += ' El hechicero, con una sonrisa siniestra, le sirve la princesa en una bandeja a su dragón. La bestia la engulle de un solo bocado y eructa satisfecha. ¡Buen provecho!';
     }
 
     addLog(deathMsg, 'death');
@@ -391,7 +391,7 @@ export function playerFlee() {
         }
     } else if (result === FLEE_RESULT.CAUGHT) {
         addLog(
-            `🏃 Intentas correr pero ${enemy.fullName} te alcanza y te bloquea el paso. ` +
+            `🏃 Intentas correr pero el ${enemy.fullName} te alcanza y te bloquea el paso. ` +
             `Debes decidir qué hacer.`,
             'flee_caught'
         );
@@ -399,7 +399,7 @@ export function playerFlee() {
         return { result: 'caught' };
     } else if (result === FLEE_RESULT.FORCED_FIGHT) {
         addLog(
-            `🏃 ¡${enemy.fullName} te agarra del cuello cuando intentabas correr! ` +
+            `🏃 ¡El ${enemy.fullName} te agarra del cuello cuando intentabas correr! ` +
             `Te obliga a pelear. No hay escapatoria.`,
             'flee_forced'
         );
@@ -435,7 +435,7 @@ export function playerBribe(goldToOffer) {
         tile.cleared = true;
 
         addLog(
-            `💰 Ofreces ${goldToOffer} monedas de oro a ${enemy.fullName}. ` +
+            `💰 Ofreces ${goldToOffer} monedas de oro al ${enemy.fullName}. ` +
             `La criatura acepta tu oferta y te deja pasar en paz.`,
             'bribe_accept'
         );
@@ -458,7 +458,7 @@ export function playerBribe(goldToOffer) {
     } else if (result === BRIBE_RESULT.REJECT) {
         state.bribeLostGold += goldToOffer;
         addLog(
-            `💰 Ofreces ${goldToOffer} monedas a ${enemy.fullName}. ` +
+            `💰 Ofreces ${goldToOffer} monedas al ${enemy.fullName}. ` +
             `La criatura toma tus monedas pero rechaza tu oferta con desdén. ` +
             `"No es suficiente", gruñe. Debes decidir qué hacer.`,
             'bribe_reject'
@@ -470,7 +470,7 @@ export function playerBribe(goldToOffer) {
         // INSULT
         state.bribeLostGold += goldToOffer;
         addLog(
-            `💰 Ofreces ${goldToOffer} monedas a ${enemy.fullName}. ` +
+            `💰 Ofreces ${goldToOffer} monedas al ${enemy.fullName}. ` +
             `¡La criatura se siente insultada por tu miserable oferta! ` +
             `Se queda con tu oro y te obliga a pelear.`,
             'bribe_insult'
@@ -500,7 +500,7 @@ export function useItem(itemIndex) {
         case 'instant_kill': {
             // Anillo del poder: mata a cualquier enemigo
             if (!state.encounter) {
-                addLog('No hay enemigo al que usar el Anillo del poder.', 'error');
+                addLog('No hay enemigo con el que usar el Anillo del poder.', 'error');
                 state.player.inventory.push(item); // devolver
                 return { result: 'invalid' };
             }
@@ -515,7 +515,7 @@ export function useItem(itemIndex) {
         case 'dragon_kill': {
             // Espada del maestro de dragones: solo contra dragones
             if (!state.encounter) {
-                addLog('No hay enemigo al que usar la Espada.', 'error');
+                addLog('No hay enemigo con el que usar la Espada.', 'error');
                 state.player.inventory.push(item);
                 return { result: 'invalid' };
             }
@@ -523,9 +523,9 @@ export function useItem(itemIndex) {
                 (enemy.pet && enemy.pet.strength === 90);
             if (!hasDragon) {
                 addLog(
-                    `⚔️ Levantas la Espada del maestro de dragones, pero ` +
+                    `⚔️ Levantas la Espada del maestro de dragones, pero el ` +
                     `${enemy.fullName} no es un dragón. La hoja permanece apagada... ` +
-                    `la espada se desmorona en tus manos. Has desperdiciado un arma legendaria.`,
+                    `la espada se desintegra en tus manos. Has desperdiciado un arma legendaria.`,
                     'item_use'
                 );
                 // No mata al enemigo; el item ya fue consumido (un solo uso)
@@ -533,7 +533,7 @@ export function useItem(itemIndex) {
             }
             addLog(
                 `⚔️ ¡Desenvainas la Espada del maestro de dragones! La hoja brilla con fuego azul. ` +
-                `${enemy.fullName} cae fulminado ante el poder ancestral de la espada.`,
+                `El ${enemy.fullName} cae fulminado ante el poder ancestral de la espada.`,
                 'item_use'
             );
             return handleFightWin();

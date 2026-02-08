@@ -457,7 +457,7 @@ function renderFightInput(callbacks, isForced = false) {
     const maxSlider = Math.min(enemy.totalStrength * 3, state.player.energy);
     const defaultValue = Math.min(enemy.totalStrength, maxSlider);
 
-    let html = `<div class="action-group"><h4>⚔️ ¿Cuánta energía inviertes?</h4>`;
+    let html = `<div class="action-group"><h4>⚔️ ¿Cuánta energía usas?</h4>`;
     html += `<p class="input-hint">Fuerza del enemigo: ${enemy.totalStrength} | Tu energía: ${state.player.energy}</p>`;
     html += `<div class="input-row">`;
     html += `<input type="range" id="energy-slider" min="1" max="${maxSlider}" value="${defaultValue}" class="energy-slider">`;
@@ -633,7 +633,7 @@ export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcome
             endingEmoji = '💀👸';
             break;
         default:
-            endingTitle = 'Has Caído';
+            endingTitle = 'Fracaso';
             endingClass = 'ending-death ending-feast';
             endingEmoji = '💀';
     }
@@ -641,11 +641,11 @@ export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcome
     // Subtítulo con causa de muerte
     if (deathInfo.deathCause && deathInfo.killedBy) {
         const causeTexts = {
-            flee: `Intentaste huir de ${deathInfo.killedBy}, pero te alcanzó y te dio muerte.`,
-            combat: `${deathInfo.killedBy} te derrotó en combate.`,
+            flee: `Intentaste huir del ${deathInfo.killedBy}, pero te alcanzó y te dio muerte.`,
+            combat: `El ${deathInfo.killedBy} te derrotó en combate.`,
             pill: 'Usaste la píldora explosiva. No queda nada de ti.',
         };
-        endingSubtitle = causeTexts[deathInfo.deathCause] || `${deathInfo.killedBy} acabó contigo.`;
+        endingSubtitle = causeTexts[deathInfo.deathCause] || `El ${deathInfo.killedBy} acabó contigo.`;
     }
 
     let killsHtml = '';
@@ -670,13 +670,13 @@ export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcome
         sceneHtml = `
             <div class="feast-scene">
                 <img src="img/dragon_feast.png" alt="El dragón devora a la princesa" class="feast-image">
-                <p class="feast-text">El hechicero, con una sonrisa siniestra, le sirvió la princesa en bandeja de plata a su dragón. La bestia la engulló de un solo bocado y eructó satisfecha. ¡Buen provecho!</p>
+                <p class="feast-text">El hechicero, con una sonrisa siniestra, le sirvió la princesa a su dragón. La bestia la engulló de un solo bocado y eructó satisfecha. ¡Buen provecho!</p>
             </div>`;
     } else if (ending === 'coward') {
         sceneHtml = `
             <div class="feast-scene">
                 <img src="img/dragon_feast.png" alt="El dragón devora a la princesa" class="feast-image">
-                <p class="feast-text">Tras tu cobarde huida, el hechicero le sirvió la princesa en bandeja de plata a su dragón. La bestia la engulló de un solo bocado y eructó satisfecha. Tu cobardía le costó la vida.</p>
+                <p class="feast-text">Tras tu cobarde huida, el hechicero le sirvió la princesa a su dragón. La bestia la engulló de un solo bocado y eructó satisfecha. Tu cobardía le costó la vida.</p>
             </div>`;
     } else if (ending === 'death_with_princess') {
         sceneHtml = `
@@ -1359,7 +1359,7 @@ async function loadHonorScores(period) {
     const container = document.getElementById('honor-table-container');
     container.innerHTML = '<p class="honor-loading">Cargando...</p>';
 
-    const { scores, error } = await getTopScores(period, 10);
+    const { scores, error } = await getTopScores(period, 20);
 
     if (error) {
         container.innerHTML = '<p class="honor-empty">Error al cargar los puntajes. Intenta de nuevo.</p>';

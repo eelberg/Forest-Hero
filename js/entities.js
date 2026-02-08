@@ -21,20 +21,20 @@ export const ENEMY_TYPES = [
 
 // --- Adjetivos para enemigos (excepto ratón) ---
 export const ADJECTIVES = [
-    'Acechante', 'Hostil', 'Horrible', 'Siniestro', 'Corrupto',
-    'Malvado', 'Amenazante', 'Pavoroso', 'Despiadado', 'Aterrador'
+    'hediondo', 'hostil', 'horrible', 'siniestro', 'corrupto',
+    'malvado', 'amenazante', 'pavoroso', 'despiadado', 'aterrador'
 ];
 
 // --- Tesoros regulares ---
 export const TREASURES = [
     { value: 10,  name: '10 monedas de oro',              emoji: '🪙' },
     { value: 20,  name: 'Una daga ritual',                 emoji: '🗡️' },
-    { value: 30,  name: 'Un collar de colmillos benditos', emoji: '📿' },
+    { value: 30,  name: 'Un collar de colmillos malditos', emoji: '📿' },
     { value: 40,  name: 'Una bolsa de polvos invisibles',  emoji: '👝' },
     { value: 50,  name: 'Un caldero de cobre antiguo',     emoji: '🫕' },
     { value: 60,  name: 'Una gema de alma latente',        emoji: '💎' },
-    { value: 70,  name: 'Un corazón de bosque petrificado', emoji: '🪨' },
-    { value: 80,  name: 'Una escama de ogro dorada',       emoji: '✨' },
+    { value: 70,  name: 'Un corazón de ogro petrificado', emoji: '🪨' },
+    { value: 80,  name: 'Una escama de dragón dorada',       emoji: '✨' },
     { value: 90,  name: 'Un orbe de fuego eterno',         emoji: '🔮' },
     { value: 100, name: 'Un cofre del tesoro',             emoji: '💰' },
 ];
@@ -59,14 +59,14 @@ export const HIDDEN_TREASURES = [
         id: 'alas_murcielago',
         name: 'Alas de murciélago',
         emoji: '🦇',
-        description: 'Te teletransportan a otro lugar aleatorio del bosque.',
+        description: 'Te teletransportan a otro lugar del bosque.',
         effect: 'teleport'
     },
     {
         id: 'pildora_explosiva',
         name: 'Píldora explosiva',
         emoji: '💊',
-        description: 'Una píldora de aspecto siniestro. ¿Qué pasará si la usas?',
+        description: 'Una píldora de aspecto curioso. ',
         effect: 'self_destruct'
     },
     {
@@ -128,7 +128,8 @@ export function createEnemy(tier, options = {}) {
         pet = {
             ...petType,
             adjectives: petAdj,
-            fullName: `${petType.name} ${petAdj.join(' y ')}`
+//            fullName: `${petType.name} ${petAdj.join(' y ')}`
+            fullName: `${petType.name}`
         };
         totalStrength = 100 + petTier;
     }
