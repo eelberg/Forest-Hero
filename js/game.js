@@ -431,9 +431,6 @@ export function playerBribe(goldToOffer) {
     const result = bribe(goldToOffer);
 
     if (result === BRIBE_RESULT.ACCEPT) {
-        const { tile } = state.encounter;
-        tile.cleared = true;
-
         addLog(
             `💰 Ofreces ${goldToOffer} monedas de oro al ${enemy.fullName}. ` +
             `La criatura acepta tu oferta y te deja pasar en paz.`,
