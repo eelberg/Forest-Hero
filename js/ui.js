@@ -8,6 +8,29 @@ import { signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, savePseudo
 import { suggestAvailablePseudonym, checkPseudonymAvailable } from './pseudonym.js';
 import { getTopScores, submitScore, checkIfTopScore, getUserBestScore } from './leaderboard.js';
 
+// --- Persistencia local para usuarios anónimos ---
+
+function getAnonData() {
+    return {
+        pseudonym: localStorage.getItem('forestHero_anonPseudonym'),
+        bestScore: localStorage.getItem('forestHero_anonBestScore')
+            ? parseInt(localStorage.getItem('forestHero_anonBestScore')) : null,
+        bestTitle: localStorage.getItem('forestHero_anonBestTitle'),
+    };
+}
+
+function saveAnonPseudonym(pseudonym) {
+    localStorage.setItem('forestHero_anonPseudonym', pseudonym);
+}
+
+function saveAnonBestScore(score, title) {
+    const current = parseInt(localStorage.getItem('forestHero_anonBestScore')) || 0;
+    if (score > current) {
+        localStorage.setItem('forestHero_anonBestScore', score.toString());
+        localStorage.setItem('forestHero_anonBestTitle', title);
+    }
+}
+
 // --- Colores por tier de enemigo ---
 const TIER_COLORS = {
     0:   '#81c784',  // Verde claro (ratón)
@@ -729,7 +752,7 @@ export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcome
             </div>
 
             <div id="end-score-message" class="end-score-message"></div>
-            <button class="btn-action btn-restart" id="btn-restart">🔄 Jugar de Nuevo</button>
+            <button class="btn-action btn-restart" id="btn-restart">🔄 Salir</button>
         </div>`;
 
     elements.endScreen.classList.add('visible');
@@ -751,6 +774,11 @@ export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcome
         }
     } catch (e) {
         console.error('Error guardando puntaje:', e);
+    }
+
+    // Guardar récord local para usuarios anónimos
+    if (!userId && scoreData.score > 0) {
+        saveAnonBestScore(scoreData.score, scoreData.title);
     }
 
     // Botón de volver a jugar
@@ -972,8 +1000,18 @@ function renderWelcomeNeedsProfile(user, welcomeCallbacks) {
 
 /**
  * Vista de bienvenida para visitante (no autenticado).
+ * Si el usuario ya tiene un seudónimo guardado en localStorage, muestra la vista de retorno.
  */
 function renderWelcomeGuest(welcomeCallbacks) {
+    const anonData = getAnonData();
+
+    if (anonData.pseudonym) {
+        // Usuario anónimo que ya eligió seudónimo anteriormente
+        renderWelcomeAnonReturning(anonData, welcomeCallbacks);
+        return;
+    }
+
+    // Primer visitante (sin seudónimo guardado)
     elements.welcomeScreen.innerHTML = `
         <div class="welcome-content">
             <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
@@ -988,7 +1026,7 @@ function renderWelcomeGuest(welcomeCallbacks) {
             <div class="welcome-actions">
                 <button class="btn-welcome btn-welcome-register" id="btn-show-register">📝 Registrarse</button>
                 <button class="btn-welcome btn-welcome-login" id="btn-show-login">🔑 Iniciar Sesión</button>
-                <button class="btn-welcome btn-welcome-anon" id="btn-play-anon">⚔️ Jugar como Anónimo</button>
+                <button class="btn-welcome btn-welcome-anon" id="btn-play-anon">⚔️ Jugar como Invitado</button>
                 <button class="btn-welcome btn-welcome-honor" id="btn-honor-guest">🏆 Salón de Honor</button>
             </div>
             <div id="auth-form-container" class="auth-form-container"></div>
@@ -1003,13 +1041,184 @@ function renderWelcomeGuest(welcomeCallbacks) {
     });
 
     document.getElementById('btn-play-anon').addEventListener('click', () => {
-        elements.welcomeScreen.classList.remove('visible');
-        welcomeCallbacks.onPlay('Anónimo', null);
+        renderAnonPseudonymForm(welcomeCallbacks);
     });
 
     document.getElementById('btn-honor-guest').addEventListener('click', () => {
         renderHonorHall(() => renderWelcomeScreen(welcomeCallbacks));
     });
+}
+
+/**
+ * Vista de bienvenida para usuario anónimo que ya tiene seudónimo guardado localmente.
+ */
+function renderWelcomeAnonReturning(anonData, welcomeCallbacks) {
+    const recordText = anonData.bestScore != null
+        ? `🏅 Récord local: ${anonData.bestScore.toLocaleString('es-CL')} pts — ${anonData.bestTitle}`
+        : '🏅 Aún sin récord — ¡juega tu primera partida!';
+
+    elements.welcomeScreen.innerHTML = `
+        <div class="welcome-content">
+            <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
+            <div class="welcome-user-info">
+                <p class="welcome-greeting">Bienvenido de vuelta,</p>
+                <p class="welcome-pseudonym">🛡️ ${escapeHtml(anonData.pseudonym)}</p>
+                <p class="welcome-record">${recordText}</p>
+                <p style="color: #b0b0b0; font-size: 0.8rem; margin-top: 0.3rem;">Jugando como invitado (datos guardados en este navegador)</p>
+            </div>
+            <div class="start-image-container">
+                <img src="img/princess_captive.png" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+            </div>
+            <div class="welcome-actions">
+                <button class="btn-welcome btn-welcome-play" id="btn-play-anon-returning">⚔️ Adentrarse en el Bosque</button>
+                <button class="btn-welcome btn-welcome-honor" id="btn-honor-anon">🏆 Salón de Honor</button>
+                <button class="btn-welcome btn-welcome-anon" id="btn-change-pseudonym">✏️ Cambiar Seudónimo</button>
+                <button class="btn-welcome btn-welcome-register" id="btn-show-register-anon">📝 Registrarse</button>
+                <button class="btn-welcome btn-welcome-login" id="btn-show-login-anon">🔑 Iniciar Sesión</button>
+            </div>
+        </div>`;
+
+    document.getElementById('btn-play-anon-returning').addEventListener('click', () => {
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay(anonData.pseudonym, null);
+    });
+
+    document.getElementById('btn-honor-anon').addEventListener('click', () => {
+        renderHonorHall(() => renderWelcomeScreen(welcomeCallbacks));
+    });
+
+    document.getElementById('btn-change-pseudonym').addEventListener('click', () => {
+        renderAnonPseudonymForm(welcomeCallbacks);
+    });
+
+    document.getElementById('btn-show-register-anon').addEventListener('click', () => {
+        showRegisterForm(welcomeCallbacks);
+    });
+
+    document.getElementById('btn-show-login-anon').addEventListener('click', () => {
+        showLoginForm(welcomeCallbacks);
+    });
+}
+
+/**
+ * Formulario de selección de seudónimo para usuarios anónimos.
+ * Similar al de registro, pero guarda el seudónimo en localStorage.
+ */
+function renderAnonPseudonymForm(welcomeCallbacks) {
+    elements.welcomeScreen.innerHTML = `
+        <div class="welcome-content">
+            <h1 class="welcome-title">🌲 Forest Hero 🌲</h1>
+            <div class="auth-form">
+                <h3>🛡️ Elige tu Seudónimo</h3>
+                <p style="color: #b0b0b0; font-size: 0.9rem; margin-bottom: 1rem;">Serás recordado con este nombre en el Salón de Honor.</p>
+                <div id="auth-error" class="auth-error"></div>
+                <div class="auth-field">
+                    <label for="anon-pseudonym">Seudónimo</label>
+                    <div class="pseudonym-input-row">
+                        <input type="text" id="anon-pseudonym" placeholder="Ej: Marqués de las Montañas" class="auth-input" maxlength="60">
+                        <button class="btn-suggest" id="btn-suggest-anon" title="Sugerir seudónimo aleatorio">🎲</button>
+                    </div>
+                    <span id="pseudonym-status" class="pseudonym-status"></span>
+                </div>
+                <button class="btn-auth btn-auth-primary" id="btn-save-anon-pseudonym">🛡️ Guardar y Jugar</button>
+                <button class="btn-auth-link" id="btn-play-without-pseudonym">Jugar sin seudónimo por ahora</button>
+                <div class="auth-divider"><span>o</span></div>
+                <button class="btn-auth-link" id="btn-back-anon">← Volver</button>
+            </div>
+        </div>`;
+
+    // Sugerir seudónimo aleatorio
+    document.getElementById('btn-suggest-anon').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-suggest-anon');
+        const input = document.getElementById('anon-pseudonym');
+        const status = document.getElementById('pseudonym-status');
+        btn.disabled = true;
+        btn.textContent = '⏳';
+        status.textContent = 'Buscando nombre disponible...';
+        status.className = 'pseudonym-status checking';
+
+        try {
+            const suggested = await suggestAvailablePseudonym();
+            input.value = suggested;
+            status.textContent = '✓ Disponible';
+            status.className = 'pseudonym-status available';
+        } catch (e) {
+            status.textContent = 'Error al sugerir. Intenta de nuevo.';
+            status.className = 'pseudonym-status error';
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🎲';
+    });
+
+    // Verificar disponibilidad mientras escribe
+    let checkTimeout;
+    document.getElementById('anon-pseudonym').addEventListener('input', (e) => {
+        clearTimeout(checkTimeout);
+        const value = e.target.value.trim();
+        const status = document.getElementById('pseudonym-status');
+
+        if (value.length < 3) {
+            status.textContent = value.length > 0 ? 'Mínimo 3 caracteres' : '';
+            status.className = 'pseudonym-status';
+            return;
+        }
+
+        status.textContent = 'Verificando...';
+        status.className = 'pseudonym-status checking';
+
+        checkTimeout = setTimeout(async () => {
+            const available = await checkPseudonymAvailable(value);
+            if (document.getElementById('anon-pseudonym')?.value.trim() === value) {
+                status.textContent = available ? '✓ Disponible' : '✗ Ya está en uso';
+                status.className = `pseudonym-status ${available ? 'available' : 'taken'}`;
+            }
+        }, 500);
+    });
+
+    // Guardar seudónimo y jugar
+    document.getElementById('btn-save-anon-pseudonym').addEventListener('click', async () => {
+        const pseudonym = document.getElementById('anon-pseudonym').value.trim();
+        const errorEl = document.getElementById('auth-error');
+        errorEl.textContent = '';
+
+        if (!pseudonym || pseudonym.length < 3) {
+            errorEl.textContent = 'El seudónimo debe tener al menos 3 caracteres.';
+            return;
+        }
+
+        const available = await checkPseudonymAvailable(pseudonym);
+        if (!available) {
+            errorEl.textContent = 'Ese seudónimo ya está en uso. Elige otro.';
+            return;
+        }
+
+        saveAnonPseudonym(pseudonym);
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay(pseudonym, null);
+    });
+
+    // Jugar sin seudónimo
+    document.getElementById('btn-play-without-pseudonym').addEventListener('click', () => {
+        elements.welcomeScreen.classList.remove('visible');
+        welcomeCallbacks.onPlay('Anónimo', null);
+    });
+
+    // Volver
+    document.getElementById('btn-back-anon').addEventListener('click', () => {
+        renderWelcomeGuest(welcomeCallbacks);
+    });
+
+    // Enter key para submit
+    const form = elements.welcomeScreen.querySelector('.auth-form');
+    form.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+            document.getElementById('btn-save-anon-pseudonym').click();
+        }
+    });
+
+    // Auto-sugerir un seudónimo al cargar
+    document.getElementById('btn-suggest-anon').click();
 }
 
 /**
