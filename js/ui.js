@@ -3,8 +3,9 @@
 // ===========================================
 
 import { getState, addLog, GameState } from './game.js';
-import { MAP_SIZE } from './map.js';
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, savePseudonym, getFullUserState } from './auth.js';
+import { initMinimapCanvas, renderMinimapCanvas } from './minimap-canvas.js';
+import { playArcadeSound } from './arcade-audio.js';
 import { suggestAvailablePseudonym, checkPseudonymAvailable } from './pseudonym.js';
 import { getTopScores, submitScore, checkIfTopScore, getUserBestScore } from './leaderboard.js';
 
@@ -82,98 +83,41 @@ export function initUI() {
         helpScreen: document.getElementById('help-screen'),
         honorHallScreen: document.getElementById('honor-hall-screen'),
         btnHelp: document.getElementById('btn-help'),
+        creaturePanel: document.getElementById('creature-panel'),
     };
+
+    initMinimapCanvas(elements.minimap, getState);
+
+    elements.gameContainer?.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-action')) playArcadeSound('uiClick');
+    });
 
     // Renderizar contenido de ayuda e inicializar botón
     renderHelpScreen();
 }
 
 // ===========================
-// MINI-MAPA 3x3
+// MINI-MAPA (canvas radar — ver minimap-canvas.js)
 // ===========================
-
-/**
- * Icono de bosque según nivel de riesgo (4 niveles).
- * Vegetación progresiva: más densa = más peligro.
- */
-function getForestIcon(tier) {
-    if (tier <= 30) return '🌾';      // Campo abierto / pasto
-    if (tier <= 50) return '🌲';      // Bosque de pinos
-    if (tier <= 80) return '🌳';      // Bosque denso
-    return '🕳️';                      // Cueva / guarida oscura
-}
-
-/**
- * Clase CSS de fondo según nivel de riesgo (4 niveles).
- */
-function getForestClass(tier) {
-    if (tier <= 30) return 'forest-open';
-    if (tier <= 50) return 'forest-plants';
-    if (tier <= 80) return 'forest-shrubs';
-    return 'forest-dense';
-}
-
-const VIEWPORT_RADIUS = 2; // 2 casillas en cada dirección = 5x5
 
 /**
  * Renderiza el mapa 5x5 centrado en el jugador.
  */
 export function renderMiniMap() {
-    const state = getState();
-    const { row, col } = state.player;
-    const grid = state.map.grid;
-    const size = VIEWPORT_RADIUS * 2 + 1; // 5
+    renderMinimapCanvas(getState());
+}
 
-    let html = '<div class="minimap-grid">';
-
-    for (let dr = -VIEWPORT_RADIUS; dr <= VIEWPORT_RADIUS; dr++) {
-        for (let dc = -VIEWPORT_RADIUS; dc <= VIEWPORT_RADIUS; dc++) {
-            const r = row + dr;
-            const c = col + dc;
-
-            if (dr === 0 && dc === 0) {
-                // Centro: jugador
-                html += `<div class="minimap-cell player-cell" title="Tú estás aquí">
-                    <span class="cell-icon">${state.player.hasPrincess ? '🦸👸' : '🦸'}</span>
-                </div>`;
-            } else if (r < 0 || r >= MAP_SIZE || c < 0 || c >= MAP_SIZE) {
-                // Fuera del mapa: salida
-                html += `<div class="minimap-cell border-cell" title="Salida del bosque">
-                    <span class="cell-icon">🌄</span>
-                </div>`;
-            } else {
-                const tile = grid[r][c];
-
-                if (tile.isSwamp) {
-                    html += `<div class="minimap-cell swamp-cell" title="Pantano intransitable">
-                        <span class="cell-icon">🟢</span>
-                    </div>`;
-                } else if (tile.cleared) {
-                    html += `<div class="minimap-cell cleared-cell" title="Despejada">
-                        <span class="cell-icon">✅</span>
-                    </div>`;
-                } else if (tile.visited) {
-                    const tier = tile.enemy.tier;
-                    const color = TIER_COLORS[tier] || '#666';
-                    const bgColor = TIER_BG_COLORS[tier] || '#f5f5f5';
-                    html += `<div class="minimap-cell visited-cell" style="border-color: ${color}; background: ${bgColor}" title="${tile.enemy.fullName}">
-                        <span class="cell-icon">${tile.enemy.emoji}</span>
-                    </div>`;
-                } else {
-                    // No visitada: icono de bosque según densidad/peligro
-                    const tier = tile.enemy.tier;
-                    const forestIcon = getForestIcon(tier);
-                    const forestClass = getForestClass(tier);
-                    html += `<div class="minimap-cell unknown-cell ${forestClass}" title="Bosque misterioso">
-                        <span class="cell-icon">${forestIcon}</span>
-                    </div>`;
-                }
-            }
-        }
-    }
-
-    html += '</div>';
-    elements.minimap.innerHTML = html;
+/**
+ * Efecto arcade breve tras acciones de combate / encuentro.
+ */
+export function triggerArcadeCombatJuice() {
+    playArcadeSound('combatHit');
+    const el = elements.creaturePanel;
+    if (!el) return;
+    el.classList.remove('arcade-combat-juice');
+    void el.offsetWidth;
+    el.classList.add('arcade-combat-juice');
+    setTimeout(() => el.classList.remove('arcade-combat-juice'), 450);
 }
 
 // ===========================
@@ -1064,7 +1008,7 @@ function renderWelcomeAnonReturning(anonData, welcomeCallbacks) {
                 <p class="welcome-greeting">Bienvenido de vuelta,</p>
                 <p class="welcome-pseudonym">🛡️ ${escapeHtml(anonData.pseudonym)}</p>
                 <p class="welcome-record">${recordText}</p>
-                <p style="color: #b0b0b0; font-size: 0.8rem; margin-top: 0.3rem;">Jugando como invitado (datos guardados en este navegador)</p>
+                <p style="color: #b0b0b0; font-size: 0.8rem; margin-top: 0.3rem;">Jugando como invitado</p>
             </div>
             <div class="start-image-container">
                 <img src="img/princess_captive.png" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">

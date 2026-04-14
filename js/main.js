@@ -3,7 +3,7 @@
 // ===========================================
 
 import { initGame, getState, addLog, movePlayer, playerFight, playerFlee, playerBribe, useItem, enterTile, calculateScore, GameState } from './game.js';
-import { initUI, renderWelcomeScreen, refreshUI, renderEndScreen } from './ui.js';
+import { initUI, renderWelcomeScreen, refreshUI, renderEndScreen, triggerArcadeCombatJuice } from './ui.js';
 import { getFullUserState } from './auth.js';
 
 // --- Estado de sesión ---
@@ -77,11 +77,11 @@ function handleMove(direction) {
         return;
     }
 
-    if (result.encounter) {
-        // Nuevo encuentro: la UI se actualiza para mostrar opciones de combate
-    }
-
     refreshUI(callbacks);
+
+    if (result.encounter) {
+        triggerArcadeCombatJuice();
+    }
 }
 
 function handleFight(energy) {
@@ -94,6 +94,7 @@ function handleFight(energy) {
     }
 
     refreshUI(callbacks);
+    triggerArcadeCombatJuice();
 }
 
 function handleFlee() {
@@ -117,12 +118,14 @@ function handleFlee() {
     }
 
     refreshUI(callbacks);
+    triggerArcadeCombatJuice();
 }
 
 function handleBribe(gold) {
     const result = playerBribe(gold);
 
     refreshUI(callbacks);
+    triggerArcadeCombatJuice();
 }
 
 function handleUseItem(itemIndex) {
@@ -144,6 +147,7 @@ function handleUseItem(itemIndex) {
     }
 
     refreshUI(callbacks);
+    triggerArcadeCombatJuice();
 }
 
 // --- Atajos de teclado ---

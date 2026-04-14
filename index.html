@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forest Hero - Rescata a la Princesa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.3.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
+<body class="arcade-body">
+    <div class="arcade-root">
     <!-- Pantalla de bienvenida (login/registro) -->
     <div id="welcome-screen" class="overlay-screen"></div>
 
@@ -26,11 +30,11 @@
     <div id="honor-hall-screen" class="overlay-screen"></div>
 
     <!-- Juego principal -->
-    <div id="game-container" class="game-container">
+    <div id="game-container" class="game-container arcade-cabinet-screen">
         <!-- Header -->
         <header class="game-header">
-            <h1>🌲 Forest Hero 🌲</h1>
-            <button id="btn-help" class="btn-help" title="Ayuda">❓</button>
+            <h1 class="arcade-title">FOREST HERO</h1>
+            <button id="btn-help" class="btn-help" title="Ayuda" aria-label="Ayuda">?</button>
         </header>
 
         <!-- Layout principal -->
@@ -38,7 +42,7 @@
             <!-- Columna izquierda: Narrativa -->
             <div class="column-left">
                 <div class="panel narrative-panel">
-                    <h3 class="panel-title">📜 Crónica del Bosque</h3>
+                    <h3 class="panel-title"><span class="panel-title-tag">LOG</span> Crónica</h3>
                     <div id="narrative" class="narrative-scroll"></div>
                 </div>
             </div>
@@ -46,12 +50,14 @@
             <!-- Columna derecha: Mapa + Stats + Inventario + Kills -->
             <div class="column-right">
                 <div class="panel minimap-panel">
-                    <h3 class="panel-title">🗺️ Alrededores</h3>
-                    <div id="minimap"></div>
+                    <h3 class="panel-title"><span class="panel-title-tag">RADAR</span> Alrededores</h3>
+                    <div id="minimap" class="minimap-arcade">
+                        <canvas id="minimap-canvas" width="5" height="5" aria-label="Radar del bosque cercano"></canvas>
+                    </div>
                 </div>
 
                 <div class="panel stats-panel">
-                    <h3 class="panel-title">📊 Estado</h3>
+                    <h3 class="panel-title"><span class="panel-title-tag">STATUS</span> Estado</h3>
                     <div id="stats"></div>
                 </div>
 
@@ -67,7 +73,7 @@
 
         <!-- Zona inferior: Criatura + Acciones -->
         <div class="game-bottom">
-            <div class="panel creature-panel">
+            <div class="panel creature-panel" id="creature-panel">
                 <div id="creature-display"></div>
             </div>
 
@@ -78,5 +84,6 @@
     </div>
 
     <script type="module" src="js/main.js"></script>
+    </div>
 </body>
 </html>
