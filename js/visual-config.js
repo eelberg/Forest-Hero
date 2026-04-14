@@ -86,11 +86,6 @@ function publicAsset(relativePath) {
     return `${base}${p}`.replace(/([^:]\/)\/+/g, '$1');
 }
 
-/** Ilustraciones en public/img/ (Vercel / Vite sirven desde la raíz del sitio). */
-export function publicImg(filename) {
-    return publicAsset(`img/${filename}`);
-}
-
 /**
  * Rutas de audio opcionales (Vite: coloca archivos en public/assets/sfx/)
  */

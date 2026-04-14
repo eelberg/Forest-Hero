@@ -3,7 +3,10 @@
 // ===========================================
 
 import { getState, addLog, GameState } from './game.js';
-import { publicImg } from './visual-config.js';
+import princessCaptiveUrl from './img/princess_captive.svg?url';
+import dragonFeastUrl from './img/dragon_feast.svg?url';
+import deathWithPrincessUrl from './img/death_with_princess.svg?url';
+import victoryUrl from './img/victory.svg?url';
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, savePseudonym, getFullUserState } from './auth.js';
 import { initMinimapPhaser, renderMinimapPhaser } from './phaser-radar.js';
 import { playArcadeSound } from './arcade-audio.js';
@@ -637,25 +640,25 @@ export async function renderEndScreen(scoreData, ending, deathInfo = {}, welcome
     if (ending === 'death_without_princess') {
         sceneHtml = `
             <div class="feast-scene">
-                <img src="${publicImg('dragon_feast.svg')}" alt="El dragón devora a la princesa" class="feast-image">
+                <img src="${dragonFeastUrl}" alt="El dragón devora a la princesa" class="feast-image">
                 <p class="feast-text">El hechicero, con una sonrisa siniestra, le sirvió la princesa a su dragón. La bestia la engulló de un solo bocado y eructó satisfecha. ¡Buen provecho!</p>
             </div>`;
     } else if (ending === 'coward') {
         sceneHtml = `
             <div class="feast-scene">
-                <img src="${publicImg('dragon_feast.svg')}" alt="El dragón devora a la princesa" class="feast-image">
+                <img src="${dragonFeastUrl}" alt="El dragón devora a la princesa" class="feast-image">
                 <p class="feast-text">Tras tu cobarde huida, el hechicero le sirvió la princesa a su dragón. La bestia la engulló de un solo bocado y eructó satisfecha. Tu cobardía le costó la vida.</p>
             </div>`;
     } else if (ending === 'death_with_princess') {
         sceneHtml = `
             <div class="feast-scene">
-                <img src="${publicImg('death_with_princess.svg')}" alt="El héroe y la princesa yacen muertos en el bosque" class="feast-image">
+                <img src="${deathWithPrincessUrl}" alt="El héroe y la princesa yacen muertos en el bosque" class="feast-image">
                 <p class="feast-text">El héroe y la princesa yacen juntos en el suelo del bosque. Las criaturas mágicas que lo habitan los rodean en silencio. Tan cerca de la libertad... y sin embargo, tan lejos.</p>
             </div>`;
     } else if (ending === 'victory') {
         sceneHtml = `
             <div class="feast-scene victory-scene">
-                <img src="${publicImg('victory.svg')}" alt="El rey ordena caballero al héroe" class="feast-image">
+                <img src="${victoryUrl}" alt="El rey ordena caballero al héroe" class="feast-image">
                 <p class="feast-text">El rey, agradecido por el rescate de su hija, te ordena caballero con su espada ceremonial. La princesa observa con una sonrisa. Las monedas que conseguiste en el bosque son testimonio de tu valor.</p>
             </div>`;
     }
@@ -783,7 +786,7 @@ function renderWelcomeLoggedIn(user, profile, bestResult, welcomeCallbacks) {
                 <p class="welcome-record">${recordText}</p>
             </div>
             <div class="start-image-container">
-                <img src="${publicImg('princess_captive.svg')}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+                <img src="${princessCaptiveUrl}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
             </div>
             <div class="welcome-actions">
                 <button class="btn-welcome btn-welcome-play" id="btn-play-logged">⚔️ Adentrarse en el Bosque</button>
@@ -965,7 +968,7 @@ function renderWelcomeGuest(welcomeCallbacks) {
                 <p>En la parte más oscura y profunda del bosque, un <strong>Hechicero</strong> tiene cautiva a una <strong>Princesa</strong>, custodiada por su temible <strong>Dragón</strong>.</p>
                 <p>Tu misión: adentrarte en el bosque, rescatar a la princesa y sacarla a salvo.</p>
                 <div class="start-image-container">
-                    <img src="${publicImg('princess_captive.svg')}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+                    <img src="${princessCaptiveUrl}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
                 </div>
             </div>
             <div class="welcome-actions">
@@ -1012,7 +1015,7 @@ function renderWelcomeAnonReturning(anonData, welcomeCallbacks) {
                 <p style="color: #b0b0b0; font-size: 0.8rem; margin-top: 0.3rem;">Jugando como invitado</p>
             </div>
             <div class="start-image-container">
-                <img src="${publicImg('princess_captive.svg')}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+                <img src="${princessCaptiveUrl}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
             </div>
             <div class="welcome-actions">
                 <button class="btn-welcome btn-welcome-play" id="btn-play-anon-returning">⚔️ Adentrarse en el Bosque</button>
@@ -1582,7 +1585,7 @@ export function renderStartScreen(onStart) {
                 <p>En la parte más oscura y profunda del bosque, un <strong>Hechicero</strong> tiene cautiva a una <strong>Princesa</strong>, custodiada por su temible <strong>Dragón</strong>.</p>
                 <p>Tu misión: adentrarte en el bosque, rescatar a la princesa y sacarla a salvo.</p>
                 <div class="start-image-container">
-                    <img src="${publicImg('princess_captive.svg')}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
+                    <img src="${princessCaptiveUrl}" alt="La princesa cautiva por el hechicero y su dragón" class="start-image">
                 </div>
             </div>
             <button class="btn-start" id="btn-start">⚔️ Adentrarse en el Bosque</button>
