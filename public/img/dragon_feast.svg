@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" shape-rendering="crispEdges" role="img" aria-label="La guarida del dragon">
+  <defs>
+    <linearGradient id="hall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0508"/>
+      <stop offset="100%" stop-color="#0a0204"/>
+    </linearGradient>
+    <radialGradient id="fire" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#ffaa33"/>
+      <stop offset="50%" stop-color="#cc2200"/>
+      <stop offset="100%" stop-color="#1a0505"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#hall)"/>
+  <ellipse cx="400" cy="380" rx="420" ry="80" fill="url(#fire)" opacity="0.45"/>
+  <!-- Columnas -->
+  <rect x="80" y="80" width="40" height="280" fill="#2a1510" stroke="#5a3020" stroke-width="2"/>
+  <rect x="680" y="80" width="40" height="280" fill="#2a1510" stroke="#5a3020" stroke-width="2"/>
+  <rect x="88" y="70" width="24" height="20" fill="#3a2520"/>
+  <rect x="688" y="70" width="24" height="20" fill="#3a2520"/>
+  <!-- Dragón -->
+  <ellipse cx="420" cy="200" rx="140" ry="100" fill="#2a0a08" stroke="#6b1010" stroke-width="3"/>
+  <path fill="#3d1510" d="M280 200 Q240 140 200 180 L220 240 Q260 220 300 240 Z"/>
+  <ellipse cx="520" cy="175" rx="55" ry="65" fill="#351210"/>
+  <circle cx="545" cy="165" r="18" fill="#ff4400"/>
+  <circle cx="550" cy="160" r="7" fill="#1a0505"/>
+  <circle cx="552" cy="158" r="3" fill="#fff" opacity="0.6"/>
+  <path fill="#4a1810" d="M560 200 Q620 180 660 220 L640 260 Q580 240 540 250 Z"/>
+  <!-- Chispas -->
+  <g fill="#ffcc44" opacity="0.8">
+    <rect x="320" y="300" width="6" height="6"/><rect x="340" y="285" width="4" height="4"/>
+    <rect x="480" y="310" width="5" height="5"/><rect x="510" y="290" width="6" height="6"/>
+    <rect x="450" y="320" width="4" height="4"/>
+  </g>
+  <rect x="360" y="300" width="80" height="12" rx="2" fill="#ffd700" opacity="0.25"/>
+</svg>

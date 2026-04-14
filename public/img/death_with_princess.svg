@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" shape-rendering="crispEdges" role="img" aria-label="Descanso en el bosque">
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a1028"/>
+      <stop offset="100%" stop-color="#050814"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#night)"/>
+  <circle cx="650" cy="70" r="42" fill="#b8c8e8" opacity="0.25"/>
+  <circle cx="650" cy="70" r="32" fill="#d8e4ff" opacity="0.2"/>
+  <!-- Bosque -->
+  <path fill="#061208" d="M0 220 L100 120 L200 220 L300 100 L400 220 L500 110 L600 220 L700 95 L800 220 L800 400 L0 400 Z"/>
+  <path fill="#0a1810" d="M0 260 L120 180 L240 260 L360 195 L480 260 L600 185 L720 260 L800 200 L800 400 L0 400 Z"/>
+  <rect y="280" width="800" height="120" fill="#050c08"/>
+  <!-- Suelo sombras -->
+  <ellipse cx="280" cy="310" rx="90" ry="18" fill="#000" opacity="0.35"/>
+  <ellipse cx="480" cy="308" rx="85" ry="16" fill="#000" opacity="0.35"/>
+  <!-- Héroe -->
+  <ellipse cx="280" cy="268" rx="22" ry="20" fill="#6b8cae" opacity="0.9"/>
+  <path fill="#2a4488" opacity="0.85" d="M255 285 h50 v45 h-50 z"/>
+  <rect x="268" y="325" width="24" height="8" fill="#1a3058"/>
+  <!-- Princesa -->
+  <ellipse cx="480" cy="272" rx="20" ry="22" fill="#f5c8d0" opacity="0.85"/>
+  <path fill="#c2185b" opacity="0.75" d="M458 290 h44 v48 h-44 z"/>
+  <rect x="468" y="282" width="24" height="6" fill="#ffd54f"/>
+  <!-- Flores / luciérnagas -->
+  <g fill="#39ff14" opacity="0.35">
+    <circle cx="150" cy="320" r="3"/><circle cx="620" cy="340" r="2"/>
+    <circle cx="720" cy="300" r="3"/><circle cx="400" cy="250" r="2"/>
+  </g>
+</svg>

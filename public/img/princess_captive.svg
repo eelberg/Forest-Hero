@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" shape-rendering="crispEdges" role="img" aria-label="Princesa cautiva en el bosque">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0a3a"/>
+      <stop offset="55%" stop-color="#0d0528"/>
+      <stop offset="100%" stop-color="#050814"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f2818"/>
+      <stop offset="100%" stop-color="#051208"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="400" fill="url(#sky)"/>
+  <circle cx="620" cy="72" r="36" fill="#e8e4ff" opacity="0.15"/>
+  <circle cx="620" cy="72" r="28" fill="#f5f0ff" opacity="0.35"/>
+  <!-- ?rboles fondo -->
+  <path fill="#081a10" d="M0 280 L40 180 L80 280 L120 160 L160 280 L200 200 L240 280 L280 170 L320 280 L360 190 L400 280 L440 210 L480 280 L520 175 L560 280 L600 195 L640 280 L680 185 L720 280 L760 200 L800 280 L800 400 L0 400 Z"/>
+  <path fill="#0d2818" d="M0 300 L60 220 L120 300 L180 230 L240 300 L300 240 L360 300 L420 225 L480 300 L540 235 L600 300 L660 220 L720 300 L780 245 L800 300 L800 400 L0 400 Z"/>
+  <rect y="300" width="800" height="100" fill="url(#ground)"/>
+  <!-- Jaula -->
+  <rect x="280" y="120" width="240" height="200" fill="#12081f" stroke="#00e8c8" stroke-width="3"/>
+  <g stroke="#00ffc8" stroke-width="2" opacity="0.85">
+    <line x1="300" y1="120" x2="300" y2="320"/><line x1="330" y1="120" x2="330" y2="320"/>
+    <line x1="360" y1="120" x2="360" y2="320"/><line x1="390" y1="120" x2="390" y2="320"/>
+    <line x1="420" y1="120" x2="420" y2="320"/><line x1="450" y1="120" x2="450" y2="320"/>
+    <line x1="480" y1="120" x2="480" y2="320"/><line x1="510" y1="120" x2="510" y2="320"/>
+  </g>
+  <rect x="278" y="115" width="244" height="10" fill="#00ffc8" opacity="0.4"/>
+  <!-- Princesa -->
+  <ellipse cx="400" cy="210" rx="22" ry="26" fill="#ffd4dc"/>
+  <rect x="388" y="232" width="24" height="8" fill="#ffd700"/>
+  <path fill="#ff2d8b" d="M372 240 h56 v68 h-56 z"/>
+  <rect x="382" y="248" width="36" height="4" fill="#ff6eb0"/>
+  <!-- Hechicero -->
+  <ellipse cx="200" cy="248" rx="20" ry="24" fill="#c9b8e0"/>
+  <path fill="#4a148c" d="M175 268 h50 l-8 90 h-34 z"/>
+  <polygon points="200,200 220,235 180,235" fill="#2d1a4a"/>
+  <rect x="188" y="255" width="24" height="6" fill="#ffd700"/>
+  <line x1="232" y1="280" x2="268" y2="200" stroke="#9c27b0" stroke-width="4"/>
+  <!-- Drag?n (perfil) -->
+  <path fill="#1a3d28" d="M560 200 Q640 160 700 220 L720 280 L640 300 Q600 260 560 280 Z"/>
+  <circle cx="672" cy="228" r="14" fill="#2a5038"/>
+  <circle cx="678" cy="224" r="5" fill="#ff4444"/>
+  <circle cx="680" cy="223" r="2" fill="#1a0508"/>
+  <path fill="#ff6b35" opacity="0.5" d="M720 250 Q760 240 780 260 L770 275 Q740 265 720 268 Z"/>
+  <!-- Brillo -->
+  <circle cx="400" cy="200" r="60" fill="none" stroke="#00ffc8" stroke-width="1" opacity="0.15" filter="url(#glow)"/>
+</svg>

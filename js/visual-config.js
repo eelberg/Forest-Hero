@@ -86,6 +86,11 @@ function publicAsset(relativePath) {
     return `${base}${p}`.replace(/([^:]\/)\/+/g, '$1');
 }
 
+/** Ilustraciones de historia en public/img/ (p. ej. princess_captive.png o .svg) */
+export function publicImg(filename) {
+    return publicAsset(`img/${filename}`);
+}
+
 /**
  * Rutas de audio opcionales (Vite: coloca archivos en public/assets/sfx/)
  */
