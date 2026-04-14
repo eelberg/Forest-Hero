@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200" role="img" aria-label="Hroe y princesa">
+  <rect width="400" height="200" fill="#0a0514"/>
+  <ellipse cx="200" cy="175" rx="180" ry="20" fill="#0d2818" opacity="0.5"/>
+  <ellipse cx="140" cy="130" rx="35" ry="12" fill="#1a1a2e" opacity="0.8"/>
+  <ellipse cx="260" cy="128" rx="32" ry="11" fill="#1a1a2e" opacity="0.8"/>
+  <ellipse cx="130" cy="115" rx="16" ry="18" fill="#4a6fa5" opacity="0.7"/>
+  <rect x="118" y="128" width="24" height="28" fill="#2244aa" opacity="0.6"/>
+  <ellipse cx="250" cy="112" rx="15" ry="17" fill="#ffb6c1" opacity="0.75"/>
+  <rect x="238" y="125" width="24" height="30" fill="#ff00aa" opacity="0.35"/>
+  <path d="M 80 60 L 100 40 M 300 50 L 320 35" stroke="#2a3a5c" stroke-width="2"/>
+  <circle cx="90" cy="45" r="2" fill="#39ff14" opacity="0.3"/>
+  <circle cx="310" cy="38" r="2" fill="#39ff14" opacity="0.25"/>
+</svg>
