@@ -77,12 +77,20 @@ export function forestFillRgba(level) {
     return `rgb(${t[0]},${t[1]},${t[2]})`;
 }
 
+function publicAsset(relativePath) {
+    const base =
+        typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL != null
+            ? import.meta.env.BASE_URL
+            : '/';
+    const p = relativePath.replace(/^\//, '');
+    return `${base}${p}`.replace(/([^:]\/)\/+/g, '$1');
+}
+
 /**
- * Rutas de audio opcionales (archivos locales). Si no existen, el módulo audio no falla.
- * Generar SFX con Bfxr / ChipTone y colocar en /assets/sfx/
+ * Rutas de audio opcionales (Vite: coloca archivos en public/assets/sfx/)
  */
 export const ARCADE_AUDIO = {
-    uiClick: 'assets/sfx/ui-click.webm',
-    combatHit: 'assets/sfx/hit.webm',
-    move: 'assets/sfx/move.webm',
+    uiClick: publicAsset('assets/sfx/ui-click.webm'),
+    combatHit: publicAsset('assets/sfx/hit.webm'),
+    move: publicAsset('assets/sfx/move.webm'),
 };

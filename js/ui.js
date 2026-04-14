@@ -4,7 +4,7 @@
 
 import { getState, addLog, GameState } from './game.js';
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, savePseudonym, getFullUserState } from './auth.js';
-import { initMinimapCanvas, renderMinimapCanvas } from './minimap-canvas.js';
+import { initMinimapPhaser, renderMinimapPhaser } from './phaser-radar.js';
 import { playArcadeSound } from './arcade-audio.js';
 import { suggestAvailablePseudonym, checkPseudonymAvailable } from './pseudonym.js';
 import { getTopScores, submitScore, checkIfTopScore, getUserBestScore } from './leaderboard.js';
@@ -86,7 +86,7 @@ export function initUI() {
         creaturePanel: document.getElementById('creature-panel'),
     };
 
-    initMinimapCanvas(elements.minimap, getState);
+    initMinimapPhaser(elements.minimap, getState);
 
     elements.gameContainer?.addEventListener('click', (e) => {
         if (e.target.closest('.btn-action')) playArcadeSound('uiClick');
@@ -97,14 +97,14 @@ export function initUI() {
 }
 
 // ===========================
-// MINI-MAPA (canvas radar — ver minimap-canvas.js)
+// MINI-MAPA (Phaser radar — ver phaser-radar.js)
 // ===========================
 
 /**
  * Renderiza el mapa 5x5 centrado en el jugador.
  */
 export function renderMiniMap() {
-    renderMinimapCanvas(getState());
+    renderMinimapPhaser(getState());
 }
 
 /**
